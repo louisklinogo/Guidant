@@ -3,7 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import { registerAICoordinationTools } from './tools/ai-coordination-full.js';
+import { registerAICoordinationTools } from './tools/ai-coordination.js';
 
 // Load environment variables
 dotenv.config();
