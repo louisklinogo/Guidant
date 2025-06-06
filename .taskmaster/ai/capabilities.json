@@ -1,0 +1,103 @@
+{
+  "tools": [
+    "create_file",
+    "edit_file",
+    "read_file",
+    "list_directory",
+    "web_search",
+    "mermaid",
+    "Bash",
+    "get_diagnostics"
+  ],
+  "toolNames": [
+    "create_file",
+    "edit_file",
+    "read_file",
+    "list_directory",
+    "web_search",
+    "mermaid",
+    "Bash",
+    "get_diagnostics"
+  ],
+  "roles": {
+    "research": {
+      "canFulfill": false,
+      "confidence": 0,
+      "missingRequired": [
+        "tavily-search",
+        "tavily-extract",
+        "tavily-crawl",
+        "get-library-docs",
+        "resolve-library-id",
+        "read_web_page"
+      ],
+      "availableOptional": [],
+      "capabilities": []
+    },
+    "design": {
+      "canFulfill": true,
+      "confidence": 0.75,
+      "missingRequired": [],
+      "availableOptional": [
+        "read_file"
+      ],
+      "capabilities": [
+        "wireframing",
+        "user_flows",
+        "component_specs",
+        "system_diagrams",
+        "architecture_design"
+      ]
+    },
+    "development": {
+      "canFulfill": true,
+      "confidence": 0.6666666666666666,
+      "missingRequired": [],
+      "availableOptional": [
+        "get_diagnostics"
+      ],
+      "capabilities": [
+        "code_generation",
+        "testing",
+        "debugging",
+        "build_management",
+        "version_control",
+        "code_quality"
+      ]
+    },
+    "testing": {
+      "canFulfill": true,
+      "confidence": 0.6666666666666666,
+      "missingRequired": [],
+      "availableOptional": [
+        "get_diagnostics"
+      ],
+      "capabilities": [
+        "unit_testing",
+        "e2e_testing",
+        "browser_automation",
+        "test_frameworks",
+        "quality_assurance"
+      ]
+    },
+    "deployment": {
+      "canFulfill": true,
+      "confidence": 0.8333333333333333,
+      "missingRequired": [],
+      "availableOptional": [
+        "web_search",
+        "get_diagnostics"
+      ],
+      "capabilities": [
+        "environment_setup",
+        "hosting_configuration",
+        "monitoring_setup",
+        "ci_cd",
+        "deployment_automation"
+      ]
+    }
+  },
+  "limitations": [],
+  "discoveredAt": "2025-06-06T14:22:30.695Z",
+  "aiEnhanced": false
+}

@@ -1,0 +1,51 @@
+{
+  "name": "taskmaster-evolution",
+  "version": "0.1.0",
+  "description": "AI Agent Workflow Framework - Transform AI assistants into systematic software developers",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "taskmaster": "bin/taskmaster.js",
+    "taskmaster-mcp": "mcp-server/server.js"
+  },
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/.bin/jest tests/",
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest tests/ --watch",
+    "mcp-server": "node mcp-server/server.js",
+    "dev": "node scripts/dev.js",
+    "build": "echo 'Build complete'",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "ai",
+    "workflow",
+    "orchestration",
+    "claude",
+    "development",
+    "automation",
+    "mcp",
+    "agent"
+  ],
+  "author": "TaskMaster Evolution Team",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "boxen": "^8.0.1",
+    "chalk": "^5.4.1",
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1",
+    "fastmcp": "^1.20.5",
+    "glob": "^11.0.2",
+    "inquirer": "^12.5.0",
+    "ora": "^8.2.0",
+    "uuid": "^11.1.0",
+    "zod": "^3.23.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-node": "^29.7.0"
+  }
+}

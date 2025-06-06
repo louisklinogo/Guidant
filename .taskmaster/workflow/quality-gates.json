@@ -1,0 +1,49 @@
+{
+  "concept": {
+    "required": [
+      "user_research",
+      "market_analysis"
+    ],
+    "status": "pending",
+    "completed": [
+      "market_analysis",
+      "user_personas"
+    ],
+    "lastUpdated": "2025-06-06T02:07:36.900Z"
+  },
+  "requirements": {
+    "required": [
+      "prd_complete",
+      "user_stories"
+    ],
+    "status": "pending"
+  },
+  "design": {
+    "required": [
+      "wireframes",
+      "user_flows"
+    ],
+    "status": "pending"
+  },
+  "architecture": {
+    "required": [
+      "system_design",
+      "tech_stack"
+    ],
+    "status": "pending"
+  },
+  "implementation": {
+    "required": [
+      "core_features",
+      "testing"
+    ],
+    "status": "pending"
+  },
+  "deployment": {
+    "required": [
+      "production_ready",
+      "monitoring"
+    ],
+    "status": "pending"
+  }
+}

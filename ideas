@@ -1,0 +1,124 @@
+
+
+[ ]work on workflow...project onboarding
+
+[ ] Logging, issues, fixes etc
+
+[ ] Since AI weve configured in taskmaster may have knowledge cutoffs in its delivering of tickets, it should try not to give tasks lie"research on company x, y or z" cos at at today, they might not be viable but rather something like "research on the top 4 or 5 companies doing so so and so"
+
+[ ]What is the dir:task-tickets for? 
+
+[ ] Also in legacy, prd was parsed into a set of tasks which could later be expanded into subtasks that the ai(you) could follow and I the human could see a dashboard in cli with tables of the comprehensive set of tasks to do and i can visually track stuff. is that something wed do?
+
+
+[ ] Tasks-from-taskmaster-main shows a detailed list of tasks and their subtasks that the legacy taskmaster project implemented and had for future 
+consideration. can we analyze it learn from it, figure out the tasks or features they had planned out for future and see if we would also need to include them in our version?
+
+[ ] You know we took a major shift when we made Taskmaster AI powered. Do you think we should also add research capabilities like (Tavily, Context7, Perplexity) or Sequential Thinking Tools (From The sequential thinking MCP) to Taskmaster to make it more intelligent even though its a **systematic workflow orchestrator** for AI coding agents? Lets discuss
+
+
+
+
+No, there's no auto-update system. The current approach is manual discovery only:
+
+One-time discovery - discoverCapabilities() runs when project initializes
+Static storage - Results saved to .taskmaster/ai/capabilities.json
+No refresh mechanism - Registry doesn't update when tools change
+Missing capabilities:
+
+No tool change detection
+No registry versioning or updates
+No learning from successful tool usage patterns
+No adaptation based on project needs
+Should add:
+
+Tool change detection on each session start
+Registry update triggers when new tools discovered
+Learning system that improves tool recommendations based on usage
+Version tracking for capability evolution
+This is a significant gap - the system could become outdated quickly as tools change.
+
+Also I want to suggest that our own internal databse of tools be enriched from time to time so that Taskmasters own tool registly is current because many AI assisntant like copilot, cursor, replit etc might have different tools and if one uses Taskmaster with them, taskmaster should be able to update its own list becasue everyone has different cabilities, some may have similar capabilities under diff names and so on and so forth.
+
+
+
+## Example Output
+
+```yaml
+ticket_id: AUTH-101
+title: Implement Login Endpoint
+type: Task
+parent_story: Core Authentication Flows
+parent_epic: User Authentication System
+priority: High
+complexity: Medium
+estimated_points: 5
+status: Ready for Implementation
+
+description: |
+  Create a RESTful API endpoint that authenticates users with email/password
+  and returns a JWT token for subsequent authenticated requests.
+
+acceptance_criteria:
+  - Endpoint accepts POST requests to /api/auth/login
+  - Validates email format and password requirements
+  - Returns 200 OK with JWT token for valid credentials
+  - Returns 401 Unauthorized for invalid credentials
+  - Implements rate limiting (max 5 failed attempts per minute)
+  - Logs authentication attempts (success/failure) without passwords
+  - Response time under 300ms for 95% of requests
+
+technical_specifications:
+  - Use Express.js router for endpoint definition
+  - Implement bcrypt for password comparison
+  - Generate JWT with 15-minute expiration and refresh token
+  - Include user ID and roles in JWT payload
+  - Store refresh token in database with user association
+  - Implement express-rate-limit middleware for rate limiting
+
+dependencies:
+  - User model with password field
+  - JWT configuration service
+  - Authentication middleware
+
+implementation_guide: |
+  1. Create route in src/routes/auth.js
+  2. Implement validation using Joi or similar
+  3. Add rate limiting middleware
+  4. Implement password comparison logic
+  5. Generate and return JWT token
+  6. Add logging (ensure no sensitive data is logged)
+  7. Write unit and integration tests
+
+code_examples:
+  - language: javascript
+    description: "Route definition"
+    code: |
+      router.post('/login', validateLogin, rateLimiter, async (req, res) => {
+        try {
+          const { email, password } = req.body;
+          const user = await User.findOne({ email });
+
+          if (!user || !(await bcrypt.compare(password, user.password))) {
+            logger.warn(`Failed login attempt for email: ${email}`);
+            return res.status(401).json({ error: 'Invalid credentials' });
+          }
+
+          const token = generateJWT(user);
+          const refreshToken = await generateRefreshToken(user);
+
+          logger.info(`Successful login for user: ${user.id}`);
+          return res.json({ token, refreshToken });
+        } catch (error) {
+          logger.error(`Login error: ${error.message}`);
+          return res.status(500).json({ error: 'Authentication failed' });
+        }
+      });
+
+testing_requirements:
+  - Unit test for validation logic
+  - Unit test for token generation
+  - Integration test for successful login
+  - Integration test for invalid credentials
+  - Integration test for rate limiting
+  - Performance test for response time
