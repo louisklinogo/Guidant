@@ -1,23 +1,11 @@
 {
   "tools": [
     "create_file",
-    "edit_file",
-    "read_file",
-    "list_directory",
-    "web_search",
-    "mermaid",
-    "Bash",
-    "get_diagnostics"
+    "edit_file"
   ],
   "toolNames": [
     "create_file",
-    "edit_file",
-    "read_file",
-    "list_directory",
-    "web_search",
-    "mermaid",
-    "Bash",
-    "get_diagnostics"
+    "edit_file"
   ],
   "roles": {
     "research": {
@@ -29,75 +17,67 @@
         "tavily-crawl",
         "get-library-docs",
         "resolve-library-id",
+        "web_search",
         "read_web_page"
       ],
       "availableOptional": [],
       "capabilities": []
     },
     "design": {
-      "canFulfill": true,
-      "confidence": 0.75,
-      "missingRequired": [],
-      "availableOptional": [
-        "read_file"
+      "canFulfill": false,
+      "confidence": 0,
+      "missingRequired": [
+        "mermaid"
       ],
-      "capabilities": [
-        "wireframing",
-        "user_flows",
-        "component_specs",
-        "system_diagrams",
-        "architecture_design"
-      ]
+      "availableOptional": [],
+      "capabilities": []
     },
     "development": {
-      "canFulfill": true,
-      "confidence": 0.6666666666666666,
-      "missingRequired": [],
-      "availableOptional": [
-        "get_diagnostics"
+      "canFulfill": false,
+      "confidence": 0,
+      "missingRequired": [
+        "read_file",
+        "Bash"
       ],
-      "capabilities": [
-        "code_generation",
-        "testing",
-        "debugging",
-        "build_management",
-        "version_control",
-        "code_quality"
-      ]
+      "availableOptional": [],
+      "capabilities": []
     },
     "testing": {
-      "canFulfill": true,
-      "confidence": 0.6666666666666666,
-      "missingRequired": [],
-      "availableOptional": [
-        "get_diagnostics"
+      "canFulfill": false,
+      "confidence": 0,
+      "missingRequired": [
+        "Bash"
       ],
-      "capabilities": [
-        "unit_testing",
-        "e2e_testing",
-        "browser_automation",
-        "test_frameworks",
-        "quality_assurance"
-      ]
+      "availableOptional": [],
+      "capabilities": []
     },
     "deployment": {
-      "canFulfill": true,
-      "confidence": 0.8333333333333333,
-      "missingRequired": [],
-      "availableOptional": [
-        "web_search",
-        "get_diagnostics"
+      "canFulfill": false,
+      "confidence": 0,
+      "missingRequired": [
+        "Bash"
       ],
-      "capabilities": [
-        "environment_setup",
-        "hosting_configuration",
-        "monitoring_setup",
-        "ci_cd",
-        "deployment_automation"
-      ]
+      "availableOptional": [],
+      "capabilities": []
     }
   },
-  "limitations": [],
-  "discoveredAt": "2025-06-06T14:22:30.695Z",
+  "limitations": [
+    {
+      "category": "research",
+      "issue": "No advanced search capabilities",
+      "impact": "Limited to basic web research"
+    },
+    {
+      "category": "development",
+      "issue": "No command line access",
+      "impact": "Cannot run build tools or package managers"
+    },
+    {
+      "category": "design",
+      "issue": "No diagram generation",
+      "impact": "Limited to text-based design documentation"
+    }
+  ],
+  "discoveredAt": "2025-06-06T16:12:56.780Z",
   "aiEnhanced": false
 }

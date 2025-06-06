@@ -1,22 +1,32 @@
+[x] Audit DRAFT-REVISED, reconcile it with our current Taskmaster system and make sure details in there are accurate.
 
 
-[ ]work on workflow...project onboarding
+[x] Critically analyze the workflow and logic employed in our taskmsater system and how project onboarding is done and provide your honest assessment...
 
-[ ] Logging, issues, fixes etc
+[x] Is Taskmaster designed to include Logging, issues, fixes etc? If not add it to our draft-revised so we work on it.
 
-[ ] Since AI weve configured in taskmaster may have knowledge cutoffs in its delivering of tickets, it should try not to give tasks lie"research on company x, y or z" cos at at today, they might not be viable but rather something like "research on the top 4 or 5 companies doing so so and so"
+[] I realize that the AI weve configured in taskmaster may have knowledge cutoffs in its delivering of tickets, it should try not to give tasks like "research on company x, y or z" cos at at today, they might not be viable but rather something like "research on the top 4 or 5 companies doing so so and so"
 
-[ ]What is the dir:task-tickets for? 
+[] What is the dir:task-tickets for? 
 
-[ ] Also in legacy, prd was parsed into a set of tasks which could later be expanded into subtasks that the ai(you) could follow and I the human could see a dashboard in cli with tables of the comprehensive set of tasks to do and i can visually track stuff. is that something wed do?
-
-
-[ ] Tasks-from-taskmaster-main shows a detailed list of tasks and their subtasks that the legacy taskmaster project implemented and had for future 
-consideration. can we analyze it learn from it, figure out the tasks or features they had planned out for future and see if we would also need to include them in our version?
-
-[ ] You know we took a major shift when we made Taskmaster AI powered. Do you think we should also add research capabilities like (Tavily, Context7, Perplexity) or Sequential Thinking Tools (From The sequential thinking MCP) to Taskmaster to make it more intelligent even though its a **systematic workflow orchestrator** for AI coding agents? Lets discuss
+[x] Also in legacy, prd was parsed into a set of tasks which could later be expanded into subtasks that the ai(you) could follow and I the human could see a dashboard in cli with tables of the comprehensive set of tasks to do and i can visually track stuff. is that something wed do?
 
 
+[x] Tasks-from-taskmaster-main shows a detailed list of tasks and their subtasks that the legacy taskmaster project implemented and had for future consideration. can we analyze it learn from it, figure out the tasks or features they had planned out for future and see if we would also need to include them in our version?
+
+[x] You know we took a major shift when we made Taskmaster AI powered. Do you think we should also add research capabilities like (Tavily, Context7, Perplexity) or Sequential Thinking Tools (From The sequential thinking MCP) to Taskmaster to make it more intelligent even though its a **systematic workflow orchestrator** for AI coding agents? Lets discuss
+
+[x] Have you installed the cli ui libraries that legacy taskmaster used? 
+
+[] Create a log of all you learnt from this session into a logs dir you can always refer to and include it in agent.md for you to alwasy remember
+
+[] What are the key files we can learn how leagcy taskmaster did their cli and ui in the dir @from-taskmaster-main? lets analyze and generate a comprehenive report on it so we cna use when proceeding with darft-revised
+
+[x] check src directory, code in there, lets do one file at a time and audit it and see if we need to update or correct anything
+
+[x] Legacy docs or files are the ones named legacy in this dir
+
+[] There is nothing like Guidant Evolution, only Guidant
 
 
 No, there's no auto-update system. The current approach is manual discovery only:

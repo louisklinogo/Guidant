@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "taskmaster-evolution": {
+      "command": "node",
+      "args": ["mcp-server/server.js"],
+      "cwd": "d:/louis/Developer/task-master",
+      "env": {}
+    }
+  }
+}

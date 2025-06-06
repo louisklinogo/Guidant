@@ -338,7 +338,7 @@ function generateToolInstructions(deliverable, availableTools) {
   }
   
   if (availableTools.includes('create_file')) {
-    instructions.push('Save all deliverables as markdown files in .taskmaster/deliverables/');
+    instructions.push('Save all deliverables as markdown files in .guidant/deliverables/');
   }
   
   if (availableTools.includes('mermaid')) {

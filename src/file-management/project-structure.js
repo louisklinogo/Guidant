@@ -1,12 +1,12 @@
 /**
- * Project structure management for TaskMaster Evolution
- * Creates and manages the .taskmaster/ directory system
+ * Project structure management for Guidant Evolution
+ * Creates and manages the .guidant/ directory system
  */
 
 import fs from 'fs/promises';
 import path from 'path';
 import { 
-  TASKMASTER_DIR,
+  GUIDANT_DIR,
   PROJECT_CONFIG,
   PROJECT_PHASES,
   PROJECT_METADATA,
@@ -30,10 +30,10 @@ import {
 } from '../constants/paths.js';
 
 /**
- * Initialize the complete .taskmaster/ directory structure
+ * Initialize the complete .guidant/ directory structure
  */
 export async function initializeProjectStructure(projectRoot = process.cwd()) {
-  const taskmasterPath = path.join(projectRoot, TASKMASTER_DIR);
+  const guidantPath = path.join(projectRoot, GUIDANT_DIR);
   
   // Create directory structure
   const directories = [
@@ -56,13 +56,13 @@ export async function initializeProjectStructure(projectRoot = process.cwd()) {
   ];
 
   for (const dir of directories) {
-    await fs.mkdir(path.join(taskmasterPath, dir), { recursive: true });
+    await fs.mkdir(path.join(guidantPath, dir), { recursive: true });
   }
 
   // Initialize default configuration files
   await initializeDefaultFiles(projectRoot);
   
-  return taskmasterPath;
+  return guidantPath;
 }
 
 /**
@@ -164,8 +164,8 @@ export async function writeProjectFile(filePath, data, projectRoot = process.cwd
  */
 export async function isProjectInitialized(projectRoot = process.cwd()) {
   try {
-    const taskmasterPath = path.join(projectRoot, TASKMASTER_DIR);
-    await fs.access(taskmasterPath);
+    const guidantPath = path.join(projectRoot, GUIDANT_DIR);
+    await fs.access(guidantPath);
     return true;
   } catch {
     return false;

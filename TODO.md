@@ -20,7 +20,7 @@ TaskMaster addresses fundamental AI agent limitations:
 
 ### **Critical Fixes**
 - [ ] **MCP Integration Reliability** - All tools work flawlessly with Claude/Cursor
-- [ ] **File System Robustness** - `.taskmaster/` directory management works consistently
+- [ ] **File System Robustness** - `.guidant/` directory management works consistently
 - [ ] **Error Handling** - Graceful failures with clear error messages
 - [ ] **Progress Tracking** - Reliable status updates and context preservation
 - [ ] **Documentation** - Clear setup guides and usage examples
@@ -163,7 +163,7 @@ TaskMaster addresses fundamental AI agent limitations:
 
 ### **Week 3-4: Core Reliability**
 1. **Improve Error Handling** - Graceful failures everywhere
-2. **Enhance File Management** - Robust `.taskmaster/` operations
+2. **Enhance File Management** - Robust `.guidant/` operations
 3. **Test with Real Projects** - Use TaskMaster for actual development
 4. **Gather User Feedback** - What works, what doesn't
 

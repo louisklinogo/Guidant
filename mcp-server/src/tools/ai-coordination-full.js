@@ -1,6 +1,6 @@
 /**
  * AI Coordination Tools for MCP Server
- * Provides tools for AI agents to interact with TaskMaster Evolution workflow
+ * Provides tools for AI agents to interact with Guidant Evolution workflow
  */
 
 import { z } from 'zod';
@@ -24,8 +24,8 @@ import { getConfigurationSuggestions, requestToolsForAgent } from '../../../src/
 export function registerAICoordinationTools(server) {
 	// Project initialization and setup
 	server.addTool({
-		name: 'taskmaster_init_project',
-		description: 'Initialize a new TaskMaster Evolution project with structured workflow',
+		name: 'guidant_init_project',
+		description: 'Initialize a new Guidant Evolution project with structured workflow',
 		parameters: z.object({
 			projectName: z.string().describe('Name of the project'),
 			description: z.string().optional().describe('Project description'),
@@ -40,7 +40,7 @@ export function registerAICoordinationTools(server) {
 					return formatMCPResponse({
 						success: false,
 						message: 'Project already initialized',
-						nextAction: 'Use taskmaster_get_current_task to continue'
+						nextAction: 'Use guidant_get_current_task to continue'
 					});
 				}
 
@@ -70,7 +70,7 @@ export function registerAICoordinationTools(server) {
 						limitations: recommendations.possibleWithLimitations,
 						notRecommended: recommendations.notRecommended
 					},
-					nextAction: 'Use taskmaster_get_current_task to start systematic development'
+					nextAction: 'Use guidant_get_current_task to start systematic development'
 				});
 			} catch (error) {
 				return formatMCPResponse({
@@ -84,7 +84,7 @@ export function registerAICoordinationTools(server) {
 
 	// Get current task for AI to work on
 	server.addTool({
-		name: 'taskmaster_get_current_task',
+		name: 'guidant_get_current_task',
 		description: 'Get the next task the AI should work on based on current project state and capabilities',
 		parameters: z.object({
 			availableTools: z.array(z.string()).optional().describe('Current tools available to AI assistant')
@@ -97,7 +97,7 @@ export function registerAICoordinationTools(server) {
 					return formatMCPResponse({
 						success: false,
 						message: 'Project not initialized',
-						nextAction: 'Use taskmaster_init_project first'
+						nextAction: 'Use guidant_init_project first'
 					});
 				}
 
@@ -129,7 +129,7 @@ export function registerAICoordinationTools(server) {
 
 	// Report progress on current task
 	server.addTool({
-		name: 'taskmaster_report_progress',
+		name: 'guidant_report_progress',
 		description: 'Report progress on current task and log work completed',
 		parameters: z.object({
 			deliverable: z.string().describe('The deliverable that was worked on'),
@@ -194,7 +194,7 @@ export function registerAICoordinationTools(server) {
 
 	// Advance to next phase
 	server.addTool({
-		name: 'taskmaster_advance_phase',
+		name: 'guidant_advance_phase',
 		description: 'Advance to the next development phase after completing current phase requirements',
 		parameters: z.object({
 			confirmAdvancement: z.boolean().describe('Confirm that current phase is complete and ready to advance')
@@ -237,7 +237,7 @@ export function registerAICoordinationTools(server) {
 
 	// Get project status and state
 	server.addTool({
-		name: 'taskmaster_get_project_state',
+		name: 'guidant_get_project_state',
 		description: 'Get current project state, progress, and workflow status',
 		parameters: z.object({}),
 		execute: async () => {
@@ -248,7 +248,7 @@ export function registerAICoordinationTools(server) {
 					return formatMCPResponse({
 						success: false,
 						message: 'Project not initialized',
-						nextAction: 'Use taskmaster_init_project first'
+						nextAction: 'Use guidant_init_project first'
 					});
 				}
 
@@ -277,7 +277,7 @@ export function registerAICoordinationTools(server) {
 
 	// Save deliverable content
 	server.addTool({
-		name: 'taskmaster_save_deliverable',
+		name: 'guidant_save_deliverable',
 		description: 'Save completed deliverable content to appropriate location in project structure',
 		parameters: z.object({
 			deliverable: z.string().describe('Name of the deliverable'),
@@ -296,7 +296,7 @@ export function registerAICoordinationTools(server) {
 				// Use provided directory or auto-detect based on phase
 				const targetDirectory = directory || getDeliverableDirectory(currentPhase);
 				
-				const basePath = path.join(projectRoot, '.taskmaster', 'deliverables');
+				const basePath = path.join(projectRoot, '.guidant', 'deliverables');
 				const fullDirectory = path.join(basePath, targetDirectory);
 				const filePath = path.join(fullDirectory, filename);
 
@@ -311,7 +311,7 @@ export function registerAICoordinationTools(server) {
 					message: `Deliverable "${deliverable}" saved successfully`,
 					filePath: path.relative(projectRoot, filePath),
 					savedTo: `deliverables/${targetDirectory}/`,
-					nextAction: 'Use taskmaster_report_progress to mark as completed'
+					nextAction: 'Use guidant_report_progress to mark as completed'
 				};
 			} catch (error) {
 				return formatMCPResponse({
@@ -326,7 +326,7 @@ export function registerAICoordinationTools(server) {
 
 	// Discover current AI agent capabilities
 	server.addTool({
-		name: 'taskmaster_discover_agent',
+		name: 'guidant_discover_agent',
 		description: 'Discover and analyze the current AI agent\'s capabilities using universal tool registry',
 		parameters: z.object({
 			agentName: z.string().optional().describe('Name/identifier for this agent session'),
@@ -368,7 +368,7 @@ export function registerAICoordinationTools(server) {
 							])
 						)
 					},
-					nextAction: 'Use taskmaster_analyze_gaps to identify improvement opportunities'
+					nextAction: 'Use guidant_analyze_gaps to identify improvement opportunities'
 				};
 			} catch (error) {
 				return formatMCPResponse({
@@ -381,7 +381,7 @@ export function registerAICoordinationTools(server) {
 
 	// Analyze agent capability gaps
 	server.addTool({
-		name: 'taskmaster_analyze_gaps',
+		name: 'guidant_analyze_gaps',
 		description: 'Analyze gaps in agent capabilities and get specific tool recommendations',
 		parameters: z.object({
 			agentId: z.string().describe('Agent ID from discovery'),
@@ -397,7 +397,7 @@ export function registerAICoordinationTools(server) {
 				if (!agentInfo) {
 					return {
 						success: false,
-						error: `Agent ${agentId} not found. Run taskmaster_discover_agent first.`
+						error: `Agent ${agentId} not found. Run guidant_discover_agent first.`
 					};
 				}
 
@@ -430,7 +430,7 @@ export function registerAICoordinationTools(server) {
 							])
 						)
 					},
-					nextAction: 'Use taskmaster_request_tools to get configuration instructions for missing tools'
+					nextAction: 'Use guidant_request_tools to get configuration instructions for missing tools'
 				};
 			} catch (error) {
 				return formatMCPResponse({
@@ -443,7 +443,7 @@ export function registerAICoordinationTools(server) {
 
 	// Request tool configuration
 	server.addTool({
-		name: 'taskmaster_request_tools',
+		name: 'guidant_request_tools',
 		description: 'Request specific tools with detailed configuration instructions',
 		parameters: z.object({
 			agentId: z.string().describe('Agent ID from discovery'),
@@ -486,7 +486,7 @@ export function registerAICoordinationTools(server) {
 						},
 						implementationPlan: toolRequest.instructions.troubleshooting
 					},
-					nextAction: 'Follow configuration instructions, then use taskmaster_discover_agent again to verify'
+					nextAction: 'Follow configuration instructions, then use guidant_discover_agent again to verify'
 				});
 			} catch (error) {
 				return formatMCPResponse({
@@ -499,7 +499,7 @@ export function registerAICoordinationTools(server) {
 
 	// Get configuration suggestions
 	server.addTool({
-		name: 'taskmaster_suggest_config',
+		name: 'guidant_suggest_config',
 		description: 'Get optimal tool configuration suggestions for an agent',
 		parameters: z.object({
 			agentId: z.string().describe('Agent ID from discovery'),
@@ -516,7 +516,7 @@ export function registerAICoordinationTools(server) {
 				if (!agentInfo) {
 					return {
 						success: false,
-						error: `Agent ${agentId} not found. Run taskmaster_discover_agent first.`
+						error: `Agent ${agentId} not found. Run guidant_discover_agent first.`
 					};
 				}
 
@@ -547,7 +547,7 @@ export function registerAICoordinationTools(server) {
 							alternatives: rec.alternatives?.slice(0, 3)
 						}))
 					},
-					nextAction: 'Use taskmaster_request_tools to get detailed instructions for priority tools'
+					nextAction: 'Use guidant_request_tools to get detailed instructions for priority tools'
 				};
 			} catch (error) {
 				return formatMCPResponse({
@@ -560,7 +560,7 @@ export function registerAICoordinationTools(server) {
 
 	// List discovered agents
 	server.addTool({
-		name: 'taskmaster_list_agents',
+		name: 'guidant_list_agents',
 		description: 'List all discovered agents and their capabilities',
 		parameters: z.object({}),
 		execute: async () => {
@@ -585,7 +585,7 @@ export function registerAICoordinationTools(server) {
 						testing: globalAgentRegistry.findBestAgentForRole('testing')?.identity?.name,
 						deployment: globalAgentRegistry.findBestAgentForRole('deployment')?.identity?.name
 					},
-					nextAction: 'Use taskmaster_discover_agent to register current session or new agents'
+					nextAction: 'Use guidant_discover_agent to register current session or new agents'
 				};
 			} catch (error) {
 				return formatMCPResponse({

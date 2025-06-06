@@ -1,7 +1,9 @@
-# TaskMaster Evolution Agent Guidelines
+# Guidant Evolution Agent Guidelines
 
 ## Project Mission
-TaskMaster is a **systematic workflow orchestrator** for AI coding agents. It solves AI agents' core problems: context loss, lack of systematic processes, poor research habits, and inconsistent execution. The goal is to make AI agents follow proper SDLC workflows while presenting only business decisions to users.
+Guidant is a **systematic workflow orchestrator** for AI coding agents. It solves AI agents' core problems: context loss, lack of systematic processes, poor research habits, and inconsistent execution. The goal is to make AI agents follow proper SDLC workflows while presenting only business decisions to users.
+
+**Note**: TaskMaster was the legacy version - all files/directories with "legacy" in the name refer to the old TaskMaster system.
 
 ## Commands
 - **Test**: `npm test` (all tests), `npm run test:watch` (watch mode)
@@ -27,15 +29,17 @@ TaskMaster is a **systematic workflow orchestrator** for AI coding agents. It so
 
 ## Testing
 - Uses Jest with ES modules (`--experimental-vm-modules`)
-- Test files: `*.test.js` in `__tests__` directories
+- **Test files**: `*.test.js` in `tests/` directory (NOT in root)
 - Mock with `jest.fn()`, use `describe/it` structure
 - Single test: `npm test -- --testNamePattern="specific test"`
+- **NEVER** create test files in root directory - always use `tests/` folder
 
 ## Project Structure
 - Main logic in `src/` with domain-specific subdirectories
 - MCP server tools in `mcp-server/src/tools/`
 - Uses Zod for schema validation in MCP tools
-- `.taskmaster/` directory stores all project state and context
+- `.guidant/` directory stores all project state and context
+- Legacy code and tasks are in `legacy-context/`and `legacy-tasks/` respectively
 
 ## Development Priorities
 1. **Phase 1**: Fix core MCP integration and file management reliability
@@ -43,14 +47,14 @@ TaskMaster is a **systematic workflow orchestrator** for AI coding agents. It so
 3. **Phase 3**: Improve business decision translation and user experience
 4. **Phase 4**: Add multi-project support and template systems
 
-## What TaskMaster IS NOT
+## What Guidant IS NOT
 - Not a code generator or app builder
 - Not trying to replace developers
 - Not attempting "one-command app creation"
 - Not building enterprise platforms or visual designers
 - Not pursuing AI research or cutting-edge features
 
-## What TaskMaster IS
+## What Guidant IS
 - A workflow orchestrator that guides AI agents through systematic processes
 - A context management system that prevents AI session amnesia
 - A business decision translator that hides technical complexity

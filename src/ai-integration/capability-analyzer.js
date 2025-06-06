@@ -321,7 +321,7 @@ async function gatherProjectContextForCapabilities(projectRoot) {
     
     const projectFiles = await glob('**/*.{js,ts,json,md}', {
       cwd: projectRoot,
-      ignore: ['node_modules/**', '.git/**', '.taskmaster/**']
+      ignore: ['node_modules/**', '.git/**', '.guidant/**']
     });
 
     const projectState = await getProjectState(projectRoot);

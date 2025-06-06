@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-import TaskMasterEvolutionServer from './src/index.js';
+import GuidantEvolutionServer from './src/index.js';
 import dotenv from 'dotenv';
 
 // Load environment variables
 dotenv.config();
 
 /**
- * Start the MCP server for TaskMaster Evolution
+ * Start the MCP server for Guidant Evolution
  */
 async function startServer() {
-	const server = new TaskMasterEvolutionServer();
+	const server = new GuidantEvolutionServer();
 
 	// Handle graceful shutdown
 	process.on('SIGINT', async () => {

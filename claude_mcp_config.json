@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "taskmaster-evolution": {
+    "Guidant":{
       "command": "node",
       "args": ["D:/louis/Developer/task-master/mcp-server/server.js"],
       "env": {}

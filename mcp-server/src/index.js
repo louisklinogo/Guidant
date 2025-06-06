@@ -13,17 +13,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * TaskMaster Evolution MCP Server
+ * Guidant Evolution MCP Server
  * Provides AI coordination tools for systematic software development
  */
-class TaskMasterEvolutionServer {
+class GuidantEvolutionServer {
 	constructor() {
 		// Get version from package.json
 		const packagePath = path.join(__dirname, '../../package.json');
 		const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
 
 		this.options = {
-			name: 'TaskMaster Evolution',
+			name: 'Guidant Evolution',
 			version: packageJson.version,
 			description: 'AI Agent Workflow Framework for systematic software development'
 		};
@@ -78,4 +78,4 @@ class TaskMasterEvolutionServer {
 	}
 }
 
-export default TaskMasterEvolutionServer;
+export default GuidantEvolutionServer;

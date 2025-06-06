@@ -1,6 +1,6 @@
 /**
  * AI Coordination Tools for MCP Server
- * Provides tools for AI agents to interact with TaskMaster Evolution workflow
+ * Provides tools for AI agents to interact with Guidant Evolution workflow
  */
 
 import { z } from 'zod';
@@ -34,8 +34,8 @@ function formatMCPResponse(data) {
 export function registerAICoordinationTools(server) {
 	// Project initialization and setup
 	server.addTool({
-		name: 'taskmaster_init_project',
-		description: 'Initialize a new TaskMaster Evolution project with structured workflow',
+		name: 'guidant_init_project',
+		description: 'Initialize a new Guidant Evolution project with structured workflow',
 		parameters: z.object({
 			projectName: z.string().describe('Name of the project'),
 			description: z.string().optional().describe('Project description'),
@@ -50,7 +50,7 @@ export function registerAICoordinationTools(server) {
 					return formatMCPResponse({
 						success: false,
 						message: 'Project already initialized',
-						nextAction: 'Use taskmaster_get_current_task to continue'
+						nextAction: 'Use guidant_get_current_task to continue'
 					});
 				}
 
@@ -80,7 +80,7 @@ export function registerAICoordinationTools(server) {
 						limitations: recommendations.possibleWithLimitations,
 						notRecommended: recommendations.notRecommended
 					},
-					nextAction: 'Use taskmaster_get_current_task to start systematic development'
+					nextAction: 'Use guidant_get_current_task to start systematic development'
 				});
 			} catch (error) {
 				return formatMCPResponse({
@@ -94,7 +94,7 @@ export function registerAICoordinationTools(server) {
 
 	// Get current task for AI to work on
 	server.addTool({
-		name: 'taskmaster_get_current_task',
+		name: 'guidant_get_current_task',
 		description: 'Get the next task the AI should work on based on current project state and capabilities',
 		parameters: z.object({
 			availableTools: z.array(z.string()).optional().describe('Current tools available to AI assistant')
@@ -107,7 +107,7 @@ export function registerAICoordinationTools(server) {
 					return formatMCPResponse({
 						success: false,
 						message: 'Project not initialized',
-						nextAction: 'Use taskmaster_init_project first'
+						nextAction: 'Use guidant_init_project first'
 					});
 				}
 
@@ -139,7 +139,7 @@ export function registerAICoordinationTools(server) {
 
 	// Get project status and state
 	server.addTool({
-		name: 'taskmaster_get_project_state',
+		name: 'guidant_get_project_state',
 		description: 'Get current project state, progress, and workflow status',
 		parameters: z.object({}),
 		execute: async () => {
@@ -150,7 +150,7 @@ export function registerAICoordinationTools(server) {
 					return formatMCPResponse({
 						success: false,
 						message: 'Project not initialized',
-						nextAction: 'Use taskmaster_init_project first'
+						nextAction: 'Use guidant_init_project first'
 					});
 				}
 
@@ -188,7 +188,7 @@ export function registerAICoordinationTools(server) {
 
 	// Report progress on current task
 	server.addTool({
-		name: 'taskmaster_report_progress',
+		name: 'guidant_report_progress',
 		description: 'Report progress on current task and log work completed',
 		parameters: z.object({
 			deliverable: z.string().describe('The deliverable that was worked on'),

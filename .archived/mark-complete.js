@@ -1,6 +1,6 @@
-import { markDeliverableComplete, generateNextTask } from './src/workflow-logic/workflow-engine.js';
-import { readProjectFile } from './src/file-management/project-structure.js';
-import { AI_CAPABILITIES } from './src/constants/paths.js';
+import { markDeliverableComplete, generateNextTask } from '../src/workflow-logic/workflow-engine.js';
+import { readProjectFile } from '../src/file-management/project-structure.js';
+import { AI_CAPABILITIES } from '../src/constants/paths.js';
 
 async function markUserPersonasComplete() {
   console.log('✅ Marking user_personas as complete...');

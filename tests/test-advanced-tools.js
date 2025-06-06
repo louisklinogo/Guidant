@@ -4,7 +4,7 @@
  * Quick test to verify the advanced MCP tools are working
  */
 
-import TaskMasterEvolutionServer from './mcp-server/src/index.js';
+import TaskMasterEvolutionServer from '../mcp-server/src/index.js';
 
 async function testAdvancedTools() {
     console.log('🧪 Testing Advanced MCP Tools (11 tools)...\n');

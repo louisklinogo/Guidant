@@ -182,7 +182,7 @@ export async function gatherProjectContext(projectRoot, currentPhase, targetDeli
     // Get project files for context
     const projectFiles = await glob('**/*.{js,ts,json,md}', {
       cwd: projectRoot,
-      ignore: ['node_modules/**', '.git/**', '.taskmaster/**']
+      ignore: ['node_modules/**', '.git/**', '.guidant/**']
     });
 
     // Get completed deliverables

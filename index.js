@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * TaskMaster Evolution
- * AI Agent Workflow Framework for systematic software development
+ * Guidant
+ * AI Agent Workflow Orchestrator for systematic software development
  */
 
 import { fileURLToPath } from 'url';
@@ -10,6 +10,9 @@ import { dirname, resolve } from 'path';
 import { Command } from 'commander';
 import chalk from 'chalk';
 import boxen from 'boxen';
+import Table from 'cli-table3';
+import figlet from 'figlet';
+import gradient from 'gradient-string';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -31,23 +34,22 @@ if (process.argv[1] && process.argv[1].endsWith('index.js')) {
 	const program = new Command();
 
 	program
-		.name('taskmaster-evolution')
-		.description('AI Agent Workflow Framework')
+		.name('guidant')
+		.description('AI Agent Workflow Orchestrator')
 		.version(version);
 
 	// Initialize new project
 	program
 		.command('init')
-		.description('Initialize a new TaskMaster Evolution project')
+		.description('Initialize a new Guidant project')
 		.option('-n, --name <name>', 'Project name')
 		.option('-d, --description <description>', 'Project description')
 		.action(async (options) => {
 			try {
-				console.log(boxen(
-					chalk.cyan.bold('TaskMaster Evolution') + '\n' +
-					chalk.gray('AI Agent Workflow Framework'),
-					{ padding: 1, borderColor: 'cyan' }
-				));
+				// Display banner with figlet
+				const banner = figlet.textSync('Guidant', { font: 'Standard' });
+				console.log(gradient(['cyan', 'magenta'])(banner));
+				console.log(chalk.gray('AI Agent Workflow Orchestrator\n'));
 
 				if (await isProjectInitialized()) {
 					console.log(chalk.yellow('⚠️  Project already initialized'));
@@ -88,8 +90,13 @@ if (process.argv[1] && process.argv[1].endsWith('index.js')) {
 		.description('Show current project status and progress')
 		.action(async () => {
 			try {
+				// Display banner
+				const banner = figlet.textSync('Guidant', { font: 'Standard' });
+				console.log(gradient(['cyan', 'magenta'])(banner));
+				console.log(chalk.gray('AI Agent Workflow Orchestrator\n'));
+				
 				if (!(await isProjectInitialized())) {
-					console.log(chalk.yellow('⚠️  No TaskMaster project found. Run "taskmaster-evolution init" first.'));
+					console.log(chalk.yellow('⚠️  No Guidant project found. Run "guidant init" first.'));
 					return;
 				}
 
@@ -97,8 +104,15 @@ if (process.argv[1] && process.argv[1].endsWith('index.js')) {
 				const workflowState = await getCurrentWorkflowState();
 
 				console.log(boxen(
-					chalk.cyan.bold(state.config.name || 'TaskMaster Project'),
-					{ padding: 1, borderColor: 'cyan' }
+					chalk.white(
+						`${chalk.bold('Version:')} ${version}   ${chalk.bold('Project:')} ${state.config.name || 'Guidant Project'}`
+					),
+					{
+						padding: 1,
+						margin: { top: 0, bottom: 1 },
+						borderStyle: 'round',
+						borderColor: 'cyan'
+					}
 				));
 
 				console.log(chalk.bold('\n📊 Project Status:'));
@@ -106,24 +120,79 @@ if (process.argv[1] && process.argv[1].endsWith('index.js')) {
 				console.log(`Current Role: ${chalk.blue(workflowState.currentRole.role || 'Not assigned')}`);
 				console.log(`Started: ${chalk.gray(new Date(state.config.created).toLocaleDateString())}`);
 
-				// Show phase progress
+				// Show phase progress with proper table
 				console.log(chalk.bold('\n🎯 Phase Progress:'));
+				
+				// Calculate dynamic column widths based on terminal width
+				const terminalWidth = process.stdout.columns || 80;
+				const availableWidth = Math.max(60, terminalWidth - 10); // Leave margin
+				const statusWidth = 8;
+				const progressWidth = 12;
+				const phaseWidth = availableWidth - statusWidth - progressWidth;
+				
+				const phaseTable = new Table({
+					head: [
+						chalk.cyan.bold('Status'),
+						chalk.cyan.bold('Phase'),
+						chalk.cyan.bold('Progress')
+					],
+					colWidths: [statusWidth, phaseWidth, progressWidth],
+					style: {
+						head: [],
+						border: ['gray'],
+						'padding-top': 0,
+						'padding-bottom': 0,
+						compact: true
+					},
+					chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
+					wordWrap: true
+				});
+				
 				for (const [phase, info] of Object.entries(state.phases.phases)) {
-					const status = info.status === 'completed' ? '✅' : 
-					            info.status === 'active' ? '🔄' : '⏳';
-					console.log(`${status} ${phase}: ${chalk.gray(info.status)}`);
+					const status = info.status === 'completed' ? chalk.green('✓') : 
+					            info.status === 'active' ? chalk.blue('►') : chalk.yellow('○');
+					phaseTable.push([status, chalk.cyan(phase), chalk.gray(info.status)]);
 				}
+				console.log(phaseTable.toString());
 
-				// Show AI capabilities if available
+				// Show AI capabilities with proper table if available
 				if (state.capabilities && Object.keys(state.capabilities).length > 0) {
 					console.log(chalk.bold('\n🤖 AI Capabilities:'));
+					
+					// Calculate dynamic column widths for capabilities table
+					const roleWidth = 15;
+					const confidenceWidth = 12;
+					const statusWidth = availableWidth - roleWidth - confidenceWidth;
+					
+					const capabilityTable = new Table({
+						head: [
+							chalk.cyan.bold('Role'),
+							chalk.cyan.bold('Status'),
+							chalk.cyan.bold('Confidence')
+						],
+						colWidths: [roleWidth, statusWidth, confidenceWidth],
+						style: {
+							head: [],
+							border: ['gray'],
+							'padding-top': 0,
+							'padding-bottom': 0,
+							compact: true
+						},
+						chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
+						wordWrap: true
+					});
+					
 					for (const [role, capability] of Object.entries(state.capabilities.roles || {})) {
 						const confidence = Math.round(capability.confidence * 100);
 						const status = capability.canFulfill ? 
-							`${chalk.green('✓')} ${confidence}% confidence` : 
-							chalk.red('✗ Cannot fulfill');
-						console.log(`${role}: ${status}`);
+							chalk.green('✓ Available') : 
+							chalk.red('✗ Missing');
+						const confidenceDisplay = capability.canFulfill ? 
+							`${confidence}%` : 
+							chalk.gray('-');
+						capabilityTable.push([chalk.cyan(role), status, confidenceDisplay]);
 					}
+					console.log(capabilityTable.toString());
 				}
 
 			} catch (error) {
