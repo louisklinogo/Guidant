@@ -1,0 +1,93 @@
+{
+  "tools": [
+    "tavily-search",
+    "web-search",
+    "str-replace-editor",
+    "save-file",
+    "codebase-retrieval"
+  ],
+  "toolNames": [
+    "tavily-search",
+    "web-search",
+    "str-replace-editor",
+    "save-file",
+    "codebase-retrieval"
+  ],
+  "roles": {
+    "research": {
+      "canFulfill": false,
+      "confidence": 0,
+      "missingRequired": [
+        "tavily-extract",
+        "tavily-crawl",
+        "get-library-docs",
+        "resolve-library-id",
+        "web_search",
+        "read_web_page"
+      ],
+      "availableOptional": [],
+      "capabilities": []
+    },
+    "design": {
+      "canFulfill": false,
+      "confidence": 0,
+      "missingRequired": [
+        "create_file",
+        "edit_file",
+        "mermaid"
+      ],
+      "availableOptional": [
+        "tavily-search"
+      ],
+      "capabilities": []
+    },
+    "development": {
+      "canFulfill": false,
+      "confidence": 0,
+      "missingRequired": [
+        "create_file",
+        "edit_file",
+        "read_file",
+        "Bash"
+      ],
+      "availableOptional": [],
+      "capabilities": []
+    },
+    "testing": {
+      "canFulfill": false,
+      "confidence": 0,
+      "missingRequired": [
+        "create_file",
+        "edit_file",
+        "Bash"
+      ],
+      "availableOptional": [],
+      "capabilities": []
+    },
+    "deployment": {
+      "canFulfill": false,
+      "confidence": 0,
+      "missingRequired": [
+        "create_file",
+        "edit_file",
+        "Bash"
+      ],
+      "availableOptional": [],
+      "capabilities": []
+    }
+  },
+  "limitations": [
+    {
+      "category": "development",
+      "issue": "No command line access",
+      "impact": "Cannot run build tools or package managers"
+    },
+    {
+      "category": "design",
+      "issue": "No diagram generation",
+      "impact": "Limited to text-based design documentation"
+    }
+  ],
+  "discoveredAt": "2025-06-08T03:23:21.702Z",
+  "aiEnhanced": false
+}

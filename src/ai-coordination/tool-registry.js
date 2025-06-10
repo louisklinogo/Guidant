@@ -13,7 +13,7 @@ export const UNIVERSAL_TOOL_REGISTRY = {
     capabilities: ["code_generation", "documentation", "configuration", "scripting"],
     description: "Create new files with content",
     required_for: ["development", "design", "documentation"],
-    alternatives: ["write_file", "save_file", "file_create"],
+    alternatives: ["write_file", "save_file", "file_create", "str-replace-editor"],
     confidence_boost: 0.3
   },
   
@@ -22,7 +22,7 @@ export const UNIVERSAL_TOOL_REGISTRY = {
     capabilities: ["code_modification", "refactoring", "bug_fixing", "content_update"],
     description: "Modify existing files",
     required_for: ["development", "maintenance", "iteration"],
-    alternatives: ["modify_file", "update_file", "file_edit"],
+    alternatives: ["modify_file", "update_file", "file_edit", "str-replace-editor"],
     confidence_boost: 0.4
   },
   
@@ -31,7 +31,7 @@ export const UNIVERSAL_TOOL_REGISTRY = {
     capabilities: ["code_analysis", "documentation_review", "debugging", "understanding"],
     description: "Read and analyze file contents",
     required_for: ["development", "research", "debugging"],
-    alternatives: ["get_file", "file_read", "cat"],
+    alternatives: ["get_file", "file_read", "cat", "view"],
     confidence_boost: 0.2
   },
 
@@ -59,7 +59,7 @@ export const UNIVERSAL_TOOL_REGISTRY = {
     capabilities: ["real_time_research", "comprehensive_search", "fact_verification"],
     description: "Advanced AI-powered web search",
     required_for: ["research", "market_analysis", "competitive_analysis"],
-    alternatives: ["perplexity_search", "ai_search"],
+    alternatives: ["perplexity_search", "ai_search", "tavily-search_tavily", "web-search"],
     confidence_boost: 0.4
   },
 
@@ -68,7 +68,7 @@ export const UNIVERSAL_TOOL_REGISTRY = {
     capabilities: ["technical_documentation", "api_reference", "implementation_guidance"],
     description: "Fetch library documentation",
     required_for: ["technical_research", "implementation_planning"],
-    alternatives: ["fetch_docs", "library_docs", "api_docs"],
+    alternatives: ["fetch_docs", "library_docs", "api_docs", "get-library-docs_context7"],
     confidence_boost: 0.3
   },
 
@@ -77,7 +77,7 @@ export const UNIVERSAL_TOOL_REGISTRY = {
     capabilities: ["dependency_resolution", "library_discovery", "version_management"],
     description: "Resolve library identifiers",
     required_for: ["dependency_management", "library_selection"],
-    alternatives: ["find_library", "resolve_package"],
+    alternatives: ["find_library", "resolve_package", "resolve-library-id_context7"],
     confidence_boost: 0.2
   },
 
@@ -96,7 +96,7 @@ export const UNIVERSAL_TOOL_REGISTRY = {
     capabilities: ["script_execution", "build_management", "system_interaction", "automation"],
     description: "Command line execution",
     required_for: ["development", "testing", "deployment", "automation"],
-    alternatives: ["shell", "cmd", "terminal", "command_line"],
+    alternatives: ["shell", "cmd", "terminal", "command_line", "launch-process"],
     confidence_boost: 0.4
   },
 
@@ -105,7 +105,7 @@ export const UNIVERSAL_TOOL_REGISTRY = {
     capabilities: ["error_analysis", "code_quality", "debugging", "health_monitoring"],
     description: "Get system and code diagnostics",
     required_for: ["debugging", "quality_assurance"],
-    alternatives: ["lint", "check", "diagnose"],
+    alternatives: ["lint", "check", "diagnose", "diagnostics"],
     confidence_boost: 0.3
   },
 
@@ -134,7 +134,7 @@ export const UNIVERSAL_TOOL_REGISTRY = {
     capabilities: ["diagram_creation", "system_design", "workflow_visualization", "architecture"],
     description: "Create diagrams and flowcharts",
     required_for: ["design", "documentation", "architecture"],
-    alternatives: ["plantuml", "draw_io", "lucidchart"],
+    alternatives: ["plantuml", "draw_io", "lucidchart", "render-mermaid"],
     confidence_boost: 0.5
   },
 
@@ -175,6 +175,34 @@ export const UNIVERSAL_TOOL_REGISTRY = {
     required_for: ["cloud_deployment", "infrastructure"],
     alternatives: ["gcp_cli", "azure_cli", "terraform"],
     confidence_boost: 0.4
+  },
+
+  // Additional MCP-common tools
+  "codebase_search": {
+    category: "research",
+    capabilities: ["code_analysis", "pattern_finding", "documentation_search"],
+    description: "Search and analyze codebase",
+    required_for: ["research", "debugging", "understanding"],
+    alternatives: ["codebase-retrieval", "code_search", "grep"],
+    confidence_boost: 0.3
+  },
+
+  "memory_store": {
+    category: "ai_integration",
+    capabilities: ["context_preservation", "session_memory", "knowledge_retention"],
+    description: "Store and retrieve information across sessions",
+    required_for: ["ai_assistance", "context_management"],
+    alternatives: ["remember", "memory", "context_store"],
+    confidence_boost: 0.2
+  },
+
+  "web_fetch": {
+    category: "research",
+    capabilities: ["content_retrieval", "web_scraping", "data_extraction"],
+    description: "Fetch content from web pages",
+    required_for: ["research", "data_collection"],
+    alternatives: ["web-fetch", "fetch_url", "scrape_web"],
+    confidence_boost: 0.3
   }
 };
 

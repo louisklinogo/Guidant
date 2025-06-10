@@ -1,16 +1,49 @@
 /**
- * AI-Powered Capability Analysis for TaskMaster Evolution
+ * AI-Powered Capability Analysis for Guidant Evolution
  * Intelligently discovers and assesses Claude's capabilities based on available tools
+ * Enhanced with environment-based model configuration
  */
+
+import { createProviderConfig, getParametersForRole } from '../config/models.js';
 
 /**
  * AI-powered capability analyzer that understands modern development workflows
+ * Now uses Guidant's enhanced model configuration system
  */
 class AICapabilityAnalyzer {
-  constructor(apiKey, model = 'anthropic/claude-3.5-sonnet') {
-    this.apiKey = apiKey;
-    this.model = model;
-    this.baseUrl = 'https://openrouter.ai/api/v1';
+  constructor(role = 'analysis', options = {}) {
+    try {
+      // Use Guidant's model configuration system
+      const config = createProviderConfig(role);
+      const parameters = getParametersForRole(role);
+
+      this.apiKey = config.key;
+      this.model = config.model;
+      this.baseUrl = config.baseUrl;
+      this.provider = config.provider;
+      this.role = role;
+
+      // Use role-specific parameters
+      this.maxTokens = parameters.maxTokens;
+      this.temperature = parameters.temperature;
+
+      // Allow manual overrides for backward compatibility
+      if (options.apiKey) this.apiKey = options.apiKey;
+      if (options.model) this.model = options.model;
+      if (options.baseUrl) this.baseUrl = options.baseUrl;
+
+    } catch (error) {
+      console.warn(`Failed to load model configuration for role '${role}':`, error.message);
+
+      // Fallback to legacy behavior for backward compatibility
+      this.apiKey = options.apiKey || process.env.OPENROUTER_API_KEY;
+      this.model = options.model || 'google/gemini-2.0-flash-exp:free';
+      this.baseUrl = options.baseUrl || 'https://openrouter.ai/api/v1';
+      this.provider = 'openrouter';
+      this.role = role;
+      this.maxTokens = 1500;
+      this.temperature = 0.3;
+    }
   }
 
   /**
@@ -25,8 +58,8 @@ class AICapabilityAnalyzer {
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://github.com/taskmaster-evolution',
-          'X-Title': 'TaskMaster Evolution Capability Analysis'
+          'HTTP-Referer': 'https://github.com/louisklinogo/Guidant',
+          'X-Title': 'Guidant Evolution Capability Analysis'
         },
         body: JSON.stringify({
           model: this.model,
@@ -36,12 +69,12 @@ class AICapabilityAnalyzer {
               content: 'You are an expert system architect analyzing AI agent capabilities. Your job is to assess what a Claude AI agent can accomplish given specific tools, considering modern development workflows and tool synergies.'
             },
             {
-              role: 'user', 
+              role: 'user',
               content: prompt
             }
           ],
-          max_tokens: 1500,
-          temperature: 0.3
+          max_tokens: this.maxTokens,
+          temperature: this.temperature
         })
       });
 
@@ -293,22 +326,44 @@ RESPONSE FORMAT (JSON):
 }
 
 /**
- * Enhanced capability discovery with AI analysis
+ * Enhanced capability discovery with multi-provider AI analysis
+ * Now uses Guidant's model configuration system
  */
 export async function discoverCapabilitiesWithAI(availableTools, projectRoot) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  
   // Gather project context
   const projectContext = await gatherProjectContextForCapabilities(projectRoot);
-  
-  if (!apiKey) {
-    console.warn('No OPENROUTER_API_KEY found, using enhanced fallback capability analysis');
-    const analyzer = new AICapabilityAnalyzer('fallback');
-    return analyzer.fallbackCapabilityAnalysis(availableTools);
+
+  // Try different roles in order of preference for analysis tasks
+  const roles = ['analysis', 'main', 'fallback'];
+
+  // Try each role configuration
+  for (const role of roles) {
+    try {
+      console.log(`Analyzing capabilities using '${role}' role configuration...`);
+      const analyzer = new AICapabilityAnalyzer(role);
+
+      // Check if we have a valid API key for this configuration
+      if (!analyzer.apiKey) {
+        console.warn(`No API key available for '${role}' role (${analyzer.provider}), trying next...`);
+        continue;
+      }
+
+      const result = await analyzer.analyzeCapabilities(availableTools, projectContext);
+
+      if (result.success) {
+        console.log(`✅ Capability analysis completed using '${role}' role (${analyzer.provider})`);
+        return result;
+      }
+    } catch (error) {
+      console.warn(`'${role}' role failed for capability analysis:`, error.message);
+      continue;
+    }
   }
 
-  const analyzer = new AICapabilityAnalyzer(apiKey);
-  return await analyzer.analyzeCapabilities(availableTools, projectContext);
+  // Enhanced fallback
+  console.warn('All configured providers failed, using enhanced fallback capability analysis');
+  const analyzer = new AICapabilityAnalyzer('fallback');
+  return analyzer.fallbackCapabilityAnalysis(availableTools);
 }
 
 /**

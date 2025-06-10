@@ -13,6 +13,7 @@ import {
 } from '../constants/paths.js';
 import { validateTaskCapability } from '../ai-coordination/capability-discovery.js';
 import { generateAITask } from '../ai-integration/task-generator.js';
+import { PROJECT_TYPES } from '../workflow-intelligence/project-classifier.js';
 
 /**
  * SDLC Phase definitions with requirements and next steps
@@ -450,12 +451,13 @@ async function generatePhaseTransitionTask(state, projectRoot) {
 }
 
 /**
- * Advance to next phase
+ * Advance to next phase with intelligent data transformation
  */
 export async function advancePhase(projectRoot = process.cwd()) {
   const state = await getCurrentWorkflowState(projectRoot);
+  const currentPhase = state.currentPhase.phase;
   const nextPhase = state.phaseDefinition.nextPhase;
-  
+
   if (nextPhase === 'complete') {
     // Mark project as complete
     await writeProjectFile(CURRENT_PHASE, {
@@ -463,45 +465,111 @@ export async function advancePhase(projectRoot = process.cwd()) {
       phase: 'complete',
       completedAt: new Date().toISOString()
     }, projectRoot);
-    
+
     return { success: true, message: 'Project marked as complete' };
   }
 
-  // Update phase status
-  const updatedPhases = {
-    ...state.phases,
-    phases: {
-      ...state.phases.phases,
-      [state.currentPhase.phase]: {
-        ...state.phases.phases[state.currentPhase.phase],
-        status: 'completed',
-        completedAt: new Date().toISOString()
+  try {
+    // Execute phase transition with data transformation
+    const { PhaseTransitionEngine } = await import('./phase-transition-engine.js');
+    const transitionEngine = new PhaseTransitionEngine(projectRoot);
+
+    console.log(`🔄 Executing intelligent phase transition: ${currentPhase} → ${nextPhase}`);
+    const transitionResult = await transitionEngine.executeTransition(currentPhase, nextPhase);
+
+    if (!transitionResult.success) {
+      return {
+        success: false,
+        error: `Phase transition failed: ${transitionResult.error}`,
+        currentPhase,
+        nextPhase
+      };
+    }
+
+    // Update phase status
+    const updatedPhases = {
+      ...state.phases,
+      phases: {
+        ...state.phases.phases,
+        [currentPhase]: {
+          ...state.phases.phases[currentPhase],
+          status: 'completed',
+          completedAt: new Date().toISOString(),
+          transformation: transitionResult.transformation
+        },
+        [nextPhase]: {
+          ...state.phases.phases[nextPhase],
+          status: 'active',
+          startedAt: new Date().toISOString(),
+          enhancedContext: transitionResult.enhancedContext
+        }
       },
-      [nextPhase]: {
-        ...state.phases.phases[nextPhase],
-        status: 'active',
-        startedAt: new Date().toISOString()
-      }
-    },
-    current: nextPhase
-  };
+      current: nextPhase
+    };
 
-  await writeProjectFile(PROJECT_PHASES, updatedPhases, projectRoot);
-  
-  // Update current phase
-  await writeProjectFile(CURRENT_PHASE, {
-    phase: nextPhase,
-    role: null, // Will be assigned when next task is generated
-    currentTask: null,
-    progress: 0,
-    startedAt: new Date().toISOString()
-  }, projectRoot);
+    await writeProjectFile(PROJECT_PHASES, updatedPhases, projectRoot);
 
-  return { 
-    success: true, 
-    message: `Advanced to ${PHASE_DEFINITIONS[nextPhase].name} phase`,
-    nextPhase
-  };
+    // Update current phase with enhanced context
+    await writeProjectFile(CURRENT_PHASE, {
+      phase: nextPhase,
+      role: null, // Will be assigned when next task is generated
+      currentTask: null,
+      progress: 0,
+      startedAt: new Date().toISOString(),
+      enhancedContext: transitionResult.enhancedContext
+    }, projectRoot);
+
+    console.log(`✅ Successfully advanced to ${PHASE_DEFINITIONS[nextPhase].name} phase with data transformation`);
+
+    return {
+      success: true,
+      message: `Advanced to ${PHASE_DEFINITIONS[nextPhase].name} phase with intelligent data transformation`,
+      nextPhase,
+      transformation: transitionResult.transformation,
+      enhancedContext: transitionResult.enhancedContext
+    };
+
+  } catch (error) {
+    console.error(`Phase transition engine failed: ${error.message}`);
+
+    // Fallback to basic phase advancement
+    console.log('Falling back to basic phase advancement...');
+
+    const updatedPhases = {
+      ...state.phases,
+      phases: {
+        ...state.phases.phases,
+        [currentPhase]: {
+          ...state.phases.phases[currentPhase],
+          status: 'completed',
+          completedAt: new Date().toISOString()
+        },
+        [nextPhase]: {
+          ...state.phases.phases[nextPhase],
+          status: 'active',
+          startedAt: new Date().toISOString()
+        }
+      },
+      current: nextPhase
+    };
+
+    await writeProjectFile(PROJECT_PHASES, updatedPhases, projectRoot);
+
+    await writeProjectFile(CURRENT_PHASE, {
+      phase: nextPhase,
+      role: null,
+      currentTask: null,
+      progress: 0,
+      startedAt: new Date().toISOString()
+    }, projectRoot);
+
+    return {
+      success: true,
+      message: `Advanced to ${PHASE_DEFINITIONS[nextPhase].name} phase (basic mode)`,
+      nextPhase,
+      warning: 'Phase transition engine failed, used basic advancement'
+    };
+  }
 }
 
 /**
@@ -524,6 +592,61 @@ export async function markDeliverableComplete(deliverable, projectRoot = process
   await writeProjectFile(QUALITY_GATES, updated, projectRoot);
   
   return { success: true, deliverable, phase: currentPhase };
+}
+
+/**
+ * Format implementation ticket as YAML for display
+ */
+export function formatImplementationTicket(taskResult) {
+  if (taskResult.type !== 'implementation_ticket') {
+    return null;
+  }
+
+  const ticket = taskResult.task;
+
+  const yamlOutput = `
+## Implementation Ticket
+
+\`\`\`yaml
+ticket_id: ${ticket.ticket_id}
+title: ${ticket.title}
+type: ${ticket.type}
+parent_story: ${ticket.parent_story}
+parent_epic: ${ticket.parent_epic}
+priority: ${ticket.priority}
+complexity: ${ticket.complexity}
+estimated_points: ${ticket.estimated_points}
+status: ${ticket.status}
+
+description: |
+  ${ticket.description}
+
+acceptance_criteria:
+${ticket.acceptance_criteria?.map(criteria => `  - ${criteria}`).join('\n') || '  - No criteria specified'}
+
+technical_specifications:
+${ticket.technical_specifications?.map(spec => `  - ${spec}`).join('\n') || '  - No specifications provided'}
+
+dependencies:
+${ticket.dependencies?.map(dep => `  - ${dep}`).join('\n') || '  - No dependencies'}
+
+implementation_guide: |
+  ${ticket.implementation_guide || 'No implementation guide provided'}
+
+code_examples:
+${ticket.code_examples?.map(example =>
+  `  - language: ${example.language}
+    description: "${example.description}"
+    code: |
+      ${example.code.split('\n').map(line => `      ${line}`).join('\n')}`
+).join('\n') || '  - No code examples provided'}
+
+testing_requirements:
+${ticket.testing_requirements?.map(req => `  - ${req}`).join('\n') || '  - No testing requirements specified'}
+\`\`\`
+  `.trim();
+
+  return yamlOutput;
 }
 
 /**

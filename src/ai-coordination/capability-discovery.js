@@ -46,23 +46,28 @@ import { discoverCapabilitiesWithAI } from '../ai-integration/capability-analyze
 /**
  * Discover and analyze AI assistant capabilities with AI enhancement
  */
-export async function discoverCapabilities(availableTools, projectRoot = process.cwd()) {
+export async function discoverCapabilities(availableTools, projectRoot = process.cwd(), options = {}) {
   const toolNames = availableTools.map(tool => typeof tool === 'string' ? tool : tool.name);
-  
-  // Try AI-enhanced capability discovery first
-  const aiResult = await discoverCapabilitiesWithAI(toolNames, projectRoot);
-  
-  if (aiResult.success) {
-    // Convert AI format to legacy format for compatibility
-    const enhancedCapabilities = convertAICapabilitiesToLegacyFormat(aiResult.capabilities, toolNames);
-    
-    // Store capabilities for future reference
-    await writeProjectFile(AI_CAPABILITIES, enhancedCapabilities, projectRoot);
-    
-    return enhancedCapabilities;
+
+  // Skip AI analysis in test mode or when explicitly disabled
+  const skipAI = options.skipAI || process.env.NODE_ENV === 'test' || process.env.GUIDANT_TEST_MODE === 'true';
+
+  if (!skipAI) {
+    // Try AI-enhanced capability discovery first
+    const aiResult = await discoverCapabilitiesWithAI(toolNames, projectRoot);
+
+    if (aiResult.success) {
+      // Convert AI format to legacy format for compatibility
+      const enhancedCapabilities = convertAICapabilitiesToLegacyFormat(aiResult.capabilities, toolNames);
+
+      // Store capabilities for future reference
+      await writeProjectFile(AI_CAPABILITIES, enhancedCapabilities, projectRoot);
+
+      return enhancedCapabilities;
+    }
   }
-  
-  // Fallback to original logic
+
+  // Fallback to original logic (used in tests or when AI fails)
   const capabilities = {
     tools: availableTools,
     toolNames,
@@ -74,7 +79,7 @@ export async function discoverCapabilities(availableTools, projectRoot = process
 
   // Store capabilities for future reference
   await writeProjectFile(AI_CAPABILITIES, capabilities, projectRoot);
-  
+
   return capabilities;
 }
 
@@ -117,9 +122,13 @@ function analyzeRoleCapabilities(toolNames) {
     const hasRequired = requirements.required.every(tool => toolNames.includes(tool));
     const optionalCount = requirements.optional.filter(tool => toolNames.includes(tool)).length;
     
+    // Calculate confidence, handling case where there are no optional tools
+    const optionalRatio = requirements.optional.length > 0 ?
+      (optionalCount / requirements.optional.length) : 1.0;
+
     roleCapabilities[category] = {
       canFulfill: hasRequired,
-      confidence: hasRequired ? (0.5 + (optionalCount / requirements.optional.length) * 0.5) : 0,
+      confidence: hasRequired ? (0.5 + optionalRatio * 0.5) : 0,
       missingRequired: requirements.required.filter(tool => !toolNames.includes(tool)),
       availableOptional: requirements.optional.filter(tool => toolNames.includes(tool)),
       capabilities: hasRequired ? requirements.capabilities : []

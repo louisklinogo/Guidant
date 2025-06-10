@@ -2,7 +2,7 @@
   "mcpServers": {
     "Guidant":{
       "command": "node",
-      "args": ["D:/louis/Developer/task-master/mcp-server/server.js"],
+      "args": ["D:/louis/Developer/Guidant/mcp-server/server.js"],
       "env": {}
     }
   }

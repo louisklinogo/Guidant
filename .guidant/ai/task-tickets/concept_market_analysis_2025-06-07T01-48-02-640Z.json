@@ -1,0 +1,50 @@
+{
+  "id": "concept-market_analysis-1749260882643",
+  "createdAt": "2025-06-07T01:48:02.643Z",
+  "phase": "concept",
+  "role": "research_agent",
+  "deliverable": "market_analysis",
+  "status": "pending",
+  "ticket": {
+    "title": "Comprehensive Market Analysis",
+    "description": "Research target market, size, trends, and opportunities",
+    "tools": [
+      "tavily-search",
+      "web_search",
+      "read_web_page"
+    ],
+    "steps": [
+      "Search for industry market size and growth trends",
+      "Identify target market segments and demographics",
+      "Research market challenges and pain points",
+      "Analyze market timing and opportunity assessment",
+      "Document findings in structured format",
+      "Create text-based diagrams since visual diagram tools are not available"
+    ],
+    "deliverables": [
+      "Market size analysis",
+      "Target audience definition",
+      "Opportunity assessment"
+    ],
+    "qualityCriteria": [
+      "Multiple credible sources",
+      "Quantitative data included",
+      "Business insights provided"
+    ],
+    "limitations": [],
+    "instructions": [
+      "Use tavily-search for comprehensive research with multiple sources"
+    ]
+  },
+  "estimatedDuration": 30,
+  "requiredTools": [
+    "tavily-search",
+    "web_search",
+    "read_web_page"
+  ],
+  "aiGenerated": false,
+  "metadata": {
+    "filename": "concept_market_analysis_2025-06-07T01-48-02-640Z.json",
+    "savedAt": "2025-06-07T01:48:02.643Z"
+  }
+}

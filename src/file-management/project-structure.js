@@ -5,6 +5,14 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import {
+  writeJSONFile,
+  readJSONFile,
+  updateJSONFile,
+  withFileLock,
+  getFileHealth,
+  repairFileFromBackup
+} from './reliable-file-manager.js';
 import { 
   GUIDANT_DIR,
   PROJECT_CONFIG,
@@ -130,33 +138,54 @@ async function initializeDefaultFiles(projectRoot) {
 
   for (const [filePath, content] of Object.entries(defaultFiles)) {
     const fullPath = path.join(projectRoot, filePath);
-    await fs.writeFile(fullPath, JSON.stringify(content, null, 2));
+    const result = await writeJSONFile(fullPath, content, {
+      backup: false, // No backup needed for initial files
+      validate: true
+    });
+
+    if (!result.success) {
+      throw new Error(`Failed to create default file ${filePath}: ${result.error}`);
+    }
   }
 }
 
 /**
- * Read any JSON file from the project structure
+ * Read any JSON file from the project structure with reliability features
  */
 export async function readProjectFile(filePath, projectRoot = process.cwd()) {
-  try {
-    const fullPath = path.join(projectRoot, filePath);
-    const content = await fs.readFile(fullPath, 'utf8');
-    return JSON.parse(content);
-  } catch (error) {
-    throw new Error(`Failed to read ${filePath}: ${error.message}`);
+  const fullPath = path.join(projectRoot, filePath);
+
+  const result = await readJSONFile(fullPath, {
+    backup: true,
+    validate: true,
+    retries: 3
+  });
+
+  if (!result.success) {
+    throw new Error(`Failed to read ${filePath}: ${result.error}`);
   }
+
+  return result.data;
 }
 
 /**
- * Write any JSON file to the project structure
+ * Write any JSON file to the project structure with reliability features
  */
 export async function writeProjectFile(filePath, data, projectRoot = process.cwd()) {
-  try {
-    const fullPath = path.join(projectRoot, filePath);
-    await fs.writeFile(fullPath, JSON.stringify(data, null, 2));
-  } catch (error) {
-    throw new Error(`Failed to write ${filePath}: ${error.message}`);
+  const fullPath = path.join(projectRoot, filePath);
+
+  const result = await writeJSONFile(fullPath, data, {
+    backup: true,
+    validate: true,
+    atomic: true,
+    retries: 3
+  });
+
+  if (!result.success) {
+    throw new Error(`Failed to write ${filePath}: ${result.error}`);
   }
+
+  return result;
 }
 
 /**
@@ -190,4 +219,143 @@ export async function getProjectState(projectRoot = process.cwd()) {
     capabilities,
     isInitialized: true
   };
+}
+
+/**
+ * Update project file safely with merge operation
+ */
+export async function updateProjectFile(filePath, updateFn, projectRoot = process.cwd()) {
+  const fullPath = path.join(projectRoot, filePath);
+
+  const result = await updateJSONFile(fullPath, updateFn, {
+    backup: true,
+    validate: true,
+    atomic: true,
+    retries: 3
+  });
+
+  if (!result.success) {
+    throw new Error(`Failed to update ${filePath}: ${result.error}`);
+  }
+
+  return result;
+}
+
+/**
+ * Safely write to project file with file locking
+ */
+export async function writeProjectFileWithLock(filePath, data, projectRoot = process.cwd()) {
+  const fullPath = path.join(projectRoot, filePath);
+
+  return await withFileLock(fullPath, async () => {
+    return await writeProjectFile(filePath, data, projectRoot);
+  });
+}
+
+/**
+ * Check health of all project files
+ */
+export async function checkProjectHealth(projectRoot = process.cwd()) {
+  const criticalFiles = [
+    PROJECT_CONFIG,
+    PROJECT_PHASES,
+    CURRENT_PHASE,
+    QUALITY_GATES,
+    DECISIONS,
+    SESSIONS
+  ];
+
+  const health = {
+    overall: 'healthy',
+    files: {},
+    issues: [],
+    recommendations: []
+  };
+
+  for (const filePath of criticalFiles) {
+    const fullPath = path.join(projectRoot, filePath);
+    const fileHealth = await getFileHealth(fullPath);
+
+    health.files[filePath] = fileHealth;
+
+    if (!fileHealth.exists) {
+      health.issues.push({
+        type: 'missing_file',
+        file: filePath,
+        severity: 'high',
+        message: `Critical file missing: ${filePath}`
+      });
+      health.overall = 'critical';
+    } else if (!fileHealth.isValid) {
+      health.issues.push({
+        type: 'corrupted_file',
+        file: filePath,
+        severity: 'high',
+        message: `File corrupted: ${filePath} - ${fileHealth.validationError}`
+      });
+      health.overall = 'critical';
+    } else if (!fileHealth.hasBackup) {
+      health.issues.push({
+        type: 'no_backup',
+        file: filePath,
+        severity: 'medium',
+        message: `No backup available for: ${filePath}`
+      });
+      if (health.overall === 'healthy') {
+        health.overall = 'warning';
+      }
+    }
+  }
+
+  // Generate recommendations
+  if (health.issues.length === 0) {
+    health.recommendations.push('All project files are healthy');
+  } else {
+    const corruptedFiles = health.issues.filter(i => i.type === 'corrupted_file');
+    const missingFiles = health.issues.filter(i => i.type === 'missing_file');
+
+    if (corruptedFiles.length > 0) {
+      health.recommendations.push('Run repairProjectFiles() to restore corrupted files from backup');
+    }
+
+    if (missingFiles.length > 0) {
+      health.recommendations.push('Run initializeProjectStructure() to recreate missing files');
+    }
+  }
+
+  return health;
+}
+
+/**
+ * Repair corrupted project files from backups
+ */
+export async function repairProjectFiles(projectRoot = process.cwd()) {
+  const health = await checkProjectHealth(projectRoot);
+  const corruptedFiles = health.issues.filter(i => i.type === 'corrupted_file');
+
+  const results = {
+    attempted: corruptedFiles.length,
+    successful: 0,
+    failed: 0,
+    details: []
+  };
+
+  for (const issue of corruptedFiles) {
+    const fullPath = path.join(projectRoot, issue.file);
+    const repairResult = await repairFileFromBackup(fullPath);
+
+    results.details.push({
+      file: issue.file,
+      success: repairResult.success,
+      message: repairResult.success ? 'Restored from backup' : repairResult.error
+    });
+
+    if (repairResult.success) {
+      results.successful++;
+    } else {
+      results.failed++;
+    }
+  }
+
+  return results;
 }

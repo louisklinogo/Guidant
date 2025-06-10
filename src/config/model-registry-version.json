@@ -1,0 +1,32 @@
+{
+  "version": "2.0.0",
+  "lastUpdated": "2025-01-27T00:00:00.000Z",
+  "source": "taskmaster-enhanced",
+  "modelCount": 89,
+  "description": "Enhanced TaskMaster model registry with Guidant-specific improvements",
+  "features": [
+    "Comprehensive model metadata from TaskMaster",
+    "Enhanced role-based model filtering",
+    "Latest model versions (Claude 4, GPT O3/O4, Gemini 2.5)",
+    "Cost tracking and SWE benchmark scores",
+    "Support for 8 AI providers",
+    "Guidant-specific role enhancements"
+  ],
+  "providers": [
+    "anthropic",
+    "openai", 
+    "google",
+    "perplexity",
+    "xai",
+    "ollama",
+    "openrouter",
+    "mistral"
+  ],
+  "roles": [
+    "main",
+    "analysis", 
+    "research",
+    "generation",
+    "fallback"
+  ]
+}

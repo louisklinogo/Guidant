@@ -1,32 +1,81 @@
-[x] Audit DRAFT-REVISED, reconcile it with our current Taskmaster system and make sure details in there are accurate.
-
-
-[x] Critically analyze the workflow and logic employed in our taskmsater system and how project onboarding is done and provide your honest assessment...
-
-[x] Is Taskmaster designed to include Logging, issues, fixes etc? If not add it to our draft-revised so we work on it.
-
-[] I realize that the AI weve configured in taskmaster may have knowledge cutoffs in its delivering of tickets, it should try not to give tasks like "research on company x, y or z" cos at at today, they might not be viable but rather something like "research on the top 4 or 5 companies doing so so and so"
-
-[] What is the dir:task-tickets for? 
-
-[x] Also in legacy, prd was parsed into a set of tasks which could later be expanded into subtasks that the ai(you) could follow and I the human could see a dashboard in cli with tables of the comprehensive set of tasks to do and i can visually track stuff. is that something wed do?
-
-
-[x] Tasks-from-taskmaster-main shows a detailed list of tasks and their subtasks that the legacy taskmaster project implemented and had for future consideration. can we analyze it learn from it, figure out the tasks or features they had planned out for future and see if we would also need to include them in our version?
-
-[x] You know we took a major shift when we made Taskmaster AI powered. Do you think we should also add research capabilities like (Tavily, Context7, Perplexity) or Sequential Thinking Tools (From The sequential thinking MCP) to Taskmaster to make it more intelligent even though its a **systematic workflow orchestrator** for AI coding agents? Lets discuss
-
-[x] Have you installed the cli ui libraries that legacy taskmaster used? 
-
-[] Create a log of all you learnt from this session into a logs dir you can always refer to and include it in agent.md for you to alwasy remember
-
-[] What are the key files we can learn how leagcy taskmaster did their cli and ui in the dir @from-taskmaster-main? lets analyze and generate a comprehenive report on it so we cna use when proceeding with darft-revised
-
-[x] check src directory, code in there, lets do one file at a time and audit it and see if we need to update or correct anything
-
-[x] Legacy docs or files are the ones named legacy in this dir
 
 [] There is nothing like Guidant Evolution, only Guidant
+
+[] I have an issue with how Tickets are generated
+
+[] Instead of hardcoding models into codebase, cant we have a serperate filee we can define the models and then use them in the codebase? 
+
+[]research config and make sure model names, provide info etc is correct
+
+[]implementation phase, tass should follows solid principles
+
+[] logging to be realtime and documentation
+
+[] Audit Key files in src to make sure thy're solid etc
+
+[] audit project types.js to make sure lidits so
+
+[ lead magnet]
+[]src config, check folder and make sure there are no inconsistencies
+
+[] why are there fallback models hardcoded in my code
+
+[ ] audit mcp tools.
+
+[] provisio for logging in guidant system organized by current daet
+
+[] project types.js
+
+[] .Taskmaster dir covers everything for projects
+
+
+🔥 Great thinking! You're right — **SOLID principles** mainly apply to **Phase 4: Implementation**. But each SDLC phase also has **its own “best practices” or guiding principles** that make your software stronger.
+
+---
+
+🚀 **SDLC Phases + Matching Design Principles**
+
+| 🧩 Phase                    | 💡 Key Principle / Framework                                                                        |
+| --------------------------- | --------------------------------------------------------------------------------------------------- |
+| 1. **Concept**              | **Design Thinking**, **First Principles Thinking** – Focus on *why*, user value, and vision         |
+| 2. **Requirement Analysis** | **MoSCoW Prioritization**, **SMART Criteria**, **User Stories** – Define *what matters most*        |
+| 3. **System Design**        | **DRY/KISS/YAGNI**, **Design Patterns**, **High Cohesion / Low Coupling** – Blueprint smart systems |
+| 4. **Implementation**       | **SOLID Principles**, **Clean Code**, **TDD (Test-Driven Development)** – Write great code          |
+| 5. **Testing & Deployment** | **CI/CD**, **Automated Testing**, **Shift Left Testing**, **DevOps** – Ship quality code safely     |
+
+---
+
+🧠 **Quick Mnemonic: “Cool Real Systems Implement Tests”**
+Pair each with a mindset:
+
+| Phase                | 🧠 Mindset        |
+| -------------------- | ----------------- |
+| Concept              | Visionary         |
+| Requirements         | Investigator      |
+| Design               | Architect         |
+| Implementation       | Craftsman (SOLID) |
+| Testing & Deployment | Quality Guardian  |
+
+---
+
+🛠️ **Want Practical Help?**
+
+* [ ] Matching tools/tech for each phase?
+* [ ] A Notion tracker template for this?
+* [ ] Examples for your startup or fashion brand?
+
+Just say the word.
+
+
+
+
+
+
+
+
+📋 Next Steps
+Phase 2: Selective Ink integration for guidant live (real-time dashboard)
+Phase 3: Enhanced features (task integration, reports, plugin system)
 
 
 No, there's no auto-update system. The current approach is manual discovery only:

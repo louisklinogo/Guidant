@@ -9,16 +9,23 @@
     "guidant-mcp": "mcp-server/server.js"
   },
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest tests/",
-    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest tests/ --watch",
-    "mcp-server": "node mcp-server/server.js",
-    "dev": "node scripts/dev.js",
+    "test": "GUIDANT_TEST_MODE=true bun test",
+    "test:watch": "GUIDANT_TEST_MODE=true bun test --watch",
+    "test:coverage": "GUIDANT_TEST_MODE=true bun test --coverage",
+    "test:ui": "GUIDANT_TEST_MODE=true bun run src/ui/v2/test-ui.js",
+    "mcp-server": "bun run mcp-server/server.js",
+    "dev": "bun run scripts/dev.js",
     "build": "echo 'Build complete'",
-    "start": "node index.js",
+    "start": "bun run index.js",
+    "dashboard": "bun run index.js dashboard",
+    "live": "bun run index.js live",
+    "interactive": "bun run index.js interactive",
     "format": "biome format . --write",
     "format:check": "biome format .",
     "lint": "biome lint .",
-    "lint:fix": "biome lint . --write"
+    "lint:fix": "biome lint . --write",
+    "config:check": "node src/config/health-check.js",
+    "config:diagnose": "node diagnose-config-issues.js"
   },
   "keywords": [
     "ai",
@@ -42,6 +49,8 @@
     "ai": "^4.3.16",
     "boxen": "^8.0.1",
     "chalk": "^5.4.1",
+    "chokidar": "^4.0.3",
+    "cli-boxes": "^4.0.1",
     "cli-table3": "^0.6.5",
     "commander": "^11.1.0",
     "cors": "^2.8.5",
@@ -53,22 +62,31 @@
     "glob": "^11.0.2",
     "gradient-string": "^3.0.0",
     "helmet": "^8.1.0",
+    "ink": "^6.0.0",
+    "ink-spinner": "^5.0.0",
+    "ink-table": "^3.1.0",
+    "ink-text-input": "^6.0.0",
     "inquirer": "^12.5.0",
     "jsonwebtoken": "^9.0.2",
     "lru-cache": "^11.1.0",
     "ora": "^8.2.0",
+    "react": "^19.1.0",
+    "task-master-ai": "^0.16.2",
     "uuid": "^11.1.0",
     "zod": "^3.23.8"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "bun": ">=1.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/node": "^7.27.1",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-react": "^7.27.1",
+    "@babel/register": "^7.27.1",
     "@biomejs/biome": "^1.9.4",
     "execa": "^9.6.0",
-    "ink": "^6.0.0",
-    "jest": "^29.7.0",
-    "jest-environment-node": "^29.7.0",
+    "ink-testing-library": "^4.0.0",
     "mock-fs": "^5.5.0",
     "tsx": "^4.19.4"
   }

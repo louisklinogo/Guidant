@@ -1,5 +1,5 @@
 /**
- * Agent Discovery Protocol for TaskMaster Evolution
+ * Agent Discovery Protocol for Guidant Evolution
  * Universal system to discover any AI agent's capabilities
  */
 
@@ -327,30 +327,151 @@ export async function discoverAgent(method, agentId) {
 }
 
 /**
- * Discover current agent (the one running this code)
+ * Discover current agent - MCP-aware with honest console limitations
  */
 export async function discoverCurrentAgent() {
-  // This would be implemented differently based on the environment
-  // For now, we'll create a mock discovery for demonstration
-  
+  // Check if we're in an MCP environment
+  if (await isMCPEnvironment()) {
+    console.log('🔍 MCP environment detected - agent discovery will be effective');
+    return await discoverAgentViaMCP();
+  } else {
+    console.log('📟 Console environment detected - limited discovery (agent discovery only effective in MCP)');
+    return await discoverAgentInConsole();
+  }
+}
+
+/**
+ * Check if we're running in an MCP environment where real tool discovery is possible
+ */
+async function isMCPEnvironment() {
+  // Check for MCP-specific indicators
+  return (
+    typeof globalThis !== 'undefined' &&
+    (globalThis.mcpServer || globalThis.mcpTools || process.env.MCP_SERVER || process.env.MCP_ENABLED)
+  );
+}
+
+/**
+ * Discover agent capabilities via MCP (real tool discovery)
+ * This is where the REAL agent discovery happens
+ */
+async function discoverAgentViaMCP() {
+  try {
+    // In a real MCP environment, we would query the actual available tools
+    // This would use the MCP protocol to get the real tool list
+    const mcpTools = await queryMCPTools();
+
+    const currentAgent = {
+      id: 'mcp_session_agent',
+      type: 'mcp_discovery',
+      tools: mcpTools,
+      identity: {
+        type: 'ai_assistant',
+        environment: 'mcp',
+        mcpEnabled: true,
+        realDiscovery: true
+      },
+      discoveredAt: new Date().toISOString(),
+      detectionMethod: 'mcp_protocol'
+    };
+
+    const discoveryMethod = {
+      type: 'config',
+      config: {
+        tools: mcpTools,
+        identity: currentAgent.identity,
+        capabilities: {
+          strengths: determineStrengthsFromTools(mcpTools),
+          limitations: ['mcp_dependent']
+        }
+      }
+    };
+
+    return await globalAgentRegistry.discoverAgent(discoveryMethod, 'mcp_session');
+  } catch (error) {
+    console.warn('MCP discovery failed, falling back to console mode:', error.message);
+    return await discoverAgentInConsole();
+  }
+}
+
+/**
+ * Console environment discovery - honest about limitations
+ */
+async function discoverAgentInConsole() {
   const currentAgent = {
-    id: 'current_session_agent',
-    type: 'interactive',
-    promptFunction: async (prompt) => {
-      // In a real implementation, this would somehow prompt the current agent
-      // For now, return a mock response that can be parsed
-      if (prompt.includes('tools')) {
-        return "I have access to: create_file, edit_file, read_file, list_directory, web_search, read_web_page, tavily-search, mermaid, Bash, get_diagnostics";
+    id: 'console_session_agent',
+    type: 'console_limited',
+    tools: [], // No real tool discovery possible in console
+    identity: {
+      type: 'ai_assistant',
+      environment: 'console',
+      realDiscovery: false,
+      limitations: [
+        'no_real_tool_discovery',
+        'console_environment_only',
+        'discovery_only_effective_in_mcp'
+      ]
+    },
+    discoveredAt: new Date().toISOString(),
+    detectionMethod: 'console_fallback',
+    warning: 'Agent discovery is only effective in MCP environments. Console discovery provides limited information.'
+  };
+
+  const discoveryMethod = {
+    type: 'config',
+    config: {
+      tools: [],
+      identity: currentAgent.identity,
+      capabilities: {
+        strengths: ['conversation', 'guidance'],
+        limitations: [
+          'no_file_operations',
+          'no_web_access',
+          'no_tool_execution',
+          'discovery_ineffective_in_console'
+        ]
       }
-      if (prompt.includes('name')) {
-        return "I am Claude, an AI assistant created by Anthropic";
-      }
-      if (prompt.includes('capabilities')) {
-        return "I'm good at code generation, analysis, and research. I cannot access external APIs directly or modify system configurations.";
-      }
-      return "I'm an AI assistant here to help.";
     }
   };
 
-  return await globalAgentRegistry.discoverAgent(currentAgent, 'current_session');
+  return await globalAgentRegistry.discoverAgent(discoveryMethod, 'console_session');
+}
+
+/**
+ * Query MCP tools (placeholder for real MCP integration)
+ * In a real implementation, this would use the MCP protocol
+ */
+async function queryMCPTools() {
+  // This is a placeholder - in a real MCP environment, this would:
+  // 1. Connect to the MCP server
+  // 2. Query available tools using MCP protocol
+  // 3. Return the actual tool list
+
+  // For now, return empty array since we're not in a real MCP environment
+  throw new Error('MCP tool query not implemented - requires real MCP server connection');
+}
+
+/**
+ * Determine strengths based on available tools
+ */
+function determineStrengthsFromTools(tools) {
+  const strengths = [];
+
+  if (tools.some(t => t.includes('file') || t.includes('edit'))) {
+    strengths.push('file_manipulation', 'code_editing');
+  }
+
+  if (tools.some(t => t.includes('web') || t.includes('search'))) {
+    strengths.push('research', 'web_search');
+  }
+
+  if (tools.some(t => t.includes('process') || t.includes('terminal'))) {
+    strengths.push('development', 'system_operations');
+  }
+
+  if (tools.some(t => t.includes('mermaid') || t.includes('render'))) {
+    strengths.push('visualization', 'documentation');
+  }
+
+  return strengths;
 }

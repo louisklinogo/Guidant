@@ -3,7 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import { registerAICoordinationTools } from './tools/ai-coordination-full.js';
+import { registerAllGuidantTools } from './tools/index.js';
 
 // Load environment variables
 dotenv.config();
@@ -43,8 +43,8 @@ class GuidantEvolutionServer {
 	async init() {
 		if (this.initialized) return;
 
-		// Register AI coordination tools
-		registerAICoordinationTools(this.server);
+		// Register all Guidant tools (modular architecture)
+		registerAllGuidantTools(this.server);
 
 		this.initialized = true;
 		return this;

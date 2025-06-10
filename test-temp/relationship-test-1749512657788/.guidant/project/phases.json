@@ -1,0 +1,24 @@
+{
+  "phases": {
+    "concept": {
+      "status": "complete",
+      "deliverables": [
+        "market_analysis",
+        "user_personas"
+      ]
+    },
+    "requirements": {
+      "status": "complete",
+      "deliverables": [
+        "prd_complete",
+        "user_stories"
+      ]
+    },
+    "design": {
+      "status": "in_progress",
+      "deliverables": [
+        "wireframes"
+      ]
+    }
+  }
+}

@@ -1,0 +1,49 @@
+# Bun configuration file
+# https://bun.sh/docs/runtime/bunfig
+
+[test]
+# Test timeout in milliseconds (default: 5000)
+timeout = 10000
+
+# Test coverage settings
+coverage = false
+
+# Preload scripts before running tests
+# preload = ["./test-setup.js"]
+
+# Test environment
+# environment = "node"
+
+# Test reporter
+# reporter = "default"
+
+# Test discovery patterns - support both test-*.js and *.test.js patterns
+# testNamePattern = ""
+
+# Bail after N failures
+# bail = 1
+
+# Run tests in watch mode
+# watch = false
+
+# Rerun each test N times
+# rerunEach = 1
+
+[install]
+# Configure package installation
+cache = true
+exact = false
+production = false
+
+# Registry configuration
+registry = "https://registry.npmjs.org/"
+
+# Scoped registries
+# scopes = { "@myorg" = "https://npm.myorg.com/" }
+
+[run]
+# Configure bun run behavior
+shell = "system"
+
+# Environment variables for bun run
+# env = { NODE_ENV = "development" }
