@@ -100,7 +100,7 @@ function showAvailableCommands() {
  */
 export function runCLI() {
   const program = createCLIApp();
-  
+
   try {
     program.parse();
   } catch (error) {

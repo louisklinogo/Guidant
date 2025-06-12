@@ -4,6 +4,7 @@
  */
 
 import { BaseTransformer } from './base-transformer.js';
+import { TechStackResolver } from '../../config/tech-stack-resolver.js';
 
 export class DesignToArchitectureTransformer extends BaseTransformer {
   /**
@@ -37,11 +38,7 @@ export class DesignToArchitectureTransformer extends BaseTransformer {
         apiSpecs,
         securityArchitecture,
         scalabilityPlan,
-        techStack: this.generateTechStack({
-          scalability: this.determineScalabilityNeeds(insights),
-          security: this.determineSecurityNeeds(userFlows),
-          performance: this.determinePerformanceNeeds(componentSpecs)
-        }),
+        techStack: this.generateTechStackFromRequirements(insights, componentSpecs, userFlows),
         decisions: this.generateDecisions(analysis, { systemDesign, databaseSchema, apiSpecs }),
         recommendations: this.generateRecommendations(analysis, targetPhase),
         transformedAt: new Date().toISOString()
@@ -258,30 +255,58 @@ export class DesignToArchitectureTransformer extends BaseTransformer {
     }
   }
 
+  /**
+   * Generate technology stack using configuration-driven approach
+   */
+  generateTechStackFromRequirements(insights, componentSpecs, userFlows) {
+    const resolver = new TechStackResolver(process.cwd(), {
+      strategy: 'hybrid' // Use hybrid strategy for best results
+    });
+
+    // Build requirements object from analysis
+    const requirements = {
+      scalability: this.determineScalabilityNeeds(insights),
+      security: this.determineSecurityNeeds(userFlows),
+      performance: this.determinePerformanceNeeds(componentSpecs),
+      ui_complexity: this.determineUIComplexity(componentSpecs),
+      realtime: this.requiresRealtimeFeatures(componentSpecs),
+      ai: this.requiresAIFeatures(componentSpecs),
+      data_complexity: this.determineDataComplexity(insights),
+      transactions: this.requiresTransactions(insights)
+    };
+
+    // Build context object
+    const context = {
+      componentSpecs: Array.isArray(componentSpecs) ? componentSpecs : Object.values(componentSpecs),
+      userFlows: Array.isArray(userFlows) ? userFlows : Object.values(userFlows),
+      insights
+    };
+
+    return resolver.resolveTechStack(this.options.projectType, requirements, context);
+  }
+
   selectFrontendFramework(componentSpecs, designSystem) {
-    const hasComplexState = this.hasComplexStateManagement(componentSpecs);
-    const hasDesignSystem = designSystem && Object.keys(designSystem).length > 0;
-    
-    if (hasComplexState && hasDesignSystem) {
-      return this.projectConfig.defaultTechStack.frontend || 'React';
-    } else if (hasComplexState) {
-      return 'Vue.js';
-    } else {
-      return 'Vanilla JavaScript';
-    }
+    // Use tech stack resolver for consistent selection
+    const requirements = {
+      ui_complexity: this.determineUIComplexity(componentSpecs),
+      interactive: this.hasComplexStateManagement(componentSpecs)
+    };
+
+    const resolver = new TechStackResolver();
+    const stack = resolver.resolveTechStack(this.options.projectType, requirements, { componentSpecs });
+    return stack.frontend;
   }
 
   selectBackendFramework(componentSpecs) {
-    const requiresRealtime = this.requiresRealtimeFeatures(componentSpecs);
-    const requiresHighPerformance = this.requiresHighPerformance(componentSpecs);
-    
-    if (requiresRealtime) {
-      return 'Node.js/Express with Socket.io';
-    } else if (requiresHighPerformance) {
-      return 'Go/Gin';
-    } else {
-      return this.projectConfig.defaultTechStack.backend || 'Node.js/Express';
-    }
+    // Use tech stack resolver for consistent selection
+    const requirements = {
+      realtime: this.requiresRealtimeFeatures(componentSpecs),
+      performance: this.requiresHighPerformance(componentSpecs) ? 'high' : 'medium'
+    };
+
+    const resolver = new TechStackResolver();
+    const stack = resolver.resolveTechStack(this.options.projectType, requirements, { componentSpecs });
+    return stack.backend;
   }
 
   generateArchitecturalPatterns(architecture) {
@@ -877,6 +902,66 @@ export class DesignToArchitectureTransformer extends BaseTransformer {
       'DELETE': '10 per minute'
     };
     return limits[method] || '50 per minute';
+  }
+
+  // Requirement analysis helper methods
+  determineUIComplexity(componentSpecs) {
+    if (!Array.isArray(componentSpecs)) {
+      componentSpecs = Object.values(componentSpecs);
+    }
+
+    const componentCount = componentSpecs.length;
+    const hasComplexState = this.hasComplexStateManagement(componentSpecs);
+    const hasComplexInteractions = this.hasComplexComponentInteractions(componentSpecs);
+
+    if (componentCount > 15 || hasComplexState || hasComplexInteractions) {
+      return 'high';
+    } else if (componentCount > 8) {
+      return 'medium';
+    } else {
+      return 'low';
+    }
+  }
+
+  determineDataComplexity(insights) {
+    const requirements = insights.requirements || [];
+    const entities = insights.entities || [];
+
+    if (entities.length > 10 || requirements.some(req =>
+      typeof req === 'string' && req.toLowerCase().includes('complex data'))) {
+      return 'high';
+    } else if (entities.length > 5) {
+      return 'medium';
+    } else {
+      return 'low';
+    }
+  }
+
+  requiresTransactions(insights) {
+    const requirements = insights.requirements || [];
+    return requirements.some(req =>
+      typeof req === 'string' && (
+        req.toLowerCase().includes('transaction') ||
+        req.toLowerCase().includes('acid') ||
+        req.toLowerCase().includes('consistency')
+      )
+    );
+  }
+
+  requiresAIFeatures(componentSpecs) {
+    if (!Array.isArray(componentSpecs)) {
+      componentSpecs = Object.values(componentSpecs);
+    }
+
+    return componentSpecs.some(spec =>
+      spec.name && (
+        spec.name.toLowerCase().includes('ai') ||
+        spec.name.toLowerCase().includes('ml') ||
+        spec.name.toLowerCase().includes('recommendation') ||
+        spec.name.toLowerCase().includes('search') ||
+        spec.name.toLowerCase().includes('chat')
+      )
+    );
   }
 
   // Scalability assessment methods

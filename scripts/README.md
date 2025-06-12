@@ -10,8 +10,6 @@ This directory contains utility scripts for development, logging, and project ma
 **Usage:**
 ```bash
 # Get current date/time info
-node scripts/get-current-datetime.js
-# or
 bun run scripts/get-current-datetime.js
 ```
 

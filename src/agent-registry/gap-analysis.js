@@ -126,16 +126,17 @@ export class GapAnalyzer {
     gap.requiredRoles.forEach(role => {
       const roleGap = this.analyzeRoleGap(currentTools, role);
       gap.roleReadiness[role] = {
+        role: role, // Ensure role property is available
         ready: roleGap.canCurrentlyFulfill,
         confidence: roleGap.currentConfidence,
-        blockers: roleGap.missingEssentialCategories
+        blockers: roleGap.missingEssentialCategories || []
       };
 
       // Identify blocking gaps
       if (!roleGap.canCurrentlyFulfill) {
         gap.blockingGaps.push({
           role,
-          blockers: roleGap.missingEssentialCategories,
+          blockers: roleGap.missingEssentialCategories || [],
           impact: 'Cannot proceed with this phase'
         });
       }
@@ -264,18 +265,22 @@ export class GapAnalyzer {
 
     // Collect all recommendations from role gaps
     Object.values(gap.roleReadiness).forEach(roleInfo => {
-      if (!roleInfo.ready) {
-        // Get recommendations for this role's blockers
-        const roleRecommendations = this.getRecommendationsForMissingCategories(
-          roleInfo.blockers.map(cat => ({ category: cat, priority: 'essential' }))
-        );
+      if (!roleInfo.ready && roleInfo.blockers && Array.isArray(roleInfo.blockers) && roleInfo.blockers.length > 0) {
+        try {
+          // Get recommendations for this role's blockers
+          const roleRecommendations = this.getRecommendationsForMissingCategories(
+            roleInfo.blockers.map(cat => ({ category: cat, priority: 'essential' }))
+          );
 
-        roleRecommendations.forEach(rec => {
-          if (!recommendations.has(rec.name)) {
-            recommendations.set(rec.name, { ...rec, benefitsRoles: [] });
-          }
-          recommendations.get(rec.name).benefitsRoles.push(roleInfo.role);
-        });
+          roleRecommendations.forEach(rec => {
+            if (!recommendations.has(rec.name)) {
+              recommendations.set(rec.name, { ...rec, benefitsRoles: [] });
+            }
+            recommendations.get(rec.name).benefitsRoles.push(roleInfo.role);
+          });
+        } catch (error) {
+          console.error(`Error processing recommendations for role ${roleInfo.role}:`, error);
+        }
       }
     });
 

@@ -10,20 +10,8 @@ import { Box, Text, Newline } from 'ink';
  * Capabilities Section Component
  */
 export function CapabilitiesSection({ projectState, compact = false, selected = false }) {
-  // Mock capabilities data - replace with actual data from projectState
-  const capabilities = projectState?.ai?.capabilities || {
-    totalTools: 16,
-    categories: 5,
-    coverage: 85,
-    gaps: ['advanced-testing', 'deployment-automation'],
-    toolsByCategory: {
-      'Core': 4,
-      'Workflow Control': 3,
-      'Agent Discovery': 3,
-      'Capability Analysis': 3,
-      'Adaptive Workflow': 3
-    }
-  };
+  // Get actual capabilities data with intelligent fallbacks
+  const capabilities = getCapabilitiesData(projectState);
 
   const borderColor = selected ? 'cyan' : 'gray';
 
@@ -219,6 +207,120 @@ export function ToolAvailabilityGrid({ tools, compact = false }) {
       ))}
     </Box>
   );
+}
+
+/**
+ * Get capabilities data with intelligent fallbacks
+ */
+function getCapabilitiesData(projectState) {
+  // Try to get real capabilities data first
+  const realCapabilities = projectState?.capabilities;
+  const aiCapabilities = projectState?.ai?.capabilities;
+
+  // If we have real data, use it
+  if (realCapabilities || aiCapabilities) {
+    const capabilities = realCapabilities || aiCapabilities;
+
+    return {
+      totalTools: capabilities.totalTools || capabilities.tools?.length || 0,
+      categories: capabilities.categories || calculateCategories(capabilities.tools),
+      coverage: capabilities.coverage || calculateCoverage(capabilities.tools),
+      gaps: capabilities.gaps || identifyGaps(capabilities.tools),
+      toolsByCategory: capabilities.toolsByCategory || categorizeTools(capabilities.tools)
+    };
+  }
+
+  // Fallback to reasonable defaults with clear indication
+  return {
+    totalTools: 0,
+    categories: 0,
+    coverage: 0,
+    gaps: ['No capabilities data available'],
+    toolsByCategory: {},
+    _isPlaceholder: true
+  };
+}
+
+/**
+ * Calculate number of tool categories
+ */
+function calculateCategories(tools) {
+  if (!tools || !Array.isArray(tools)) return 0;
+
+  const categories = new Set();
+  tools.forEach(tool => {
+    if (tool.category) {
+      categories.add(tool.category);
+    }
+  });
+
+  return categories.size;
+}
+
+/**
+ * Calculate coverage percentage
+ */
+function calculateCoverage(tools) {
+  if (!tools || !Array.isArray(tools)) return 0;
+
+  const totalPossibleTools = 20; // Estimate of total possible tools
+  const availableTools = tools.filter(tool => tool.available !== false).length;
+
+  return Math.min(Math.round((availableTools / totalPossibleTools) * 100), 100);
+}
+
+/**
+ * Identify capability gaps
+ */
+function identifyGaps(tools) {
+  if (!tools || !Array.isArray(tools)) return ['Project not initialized'];
+
+  const gaps = [];
+  const availableCategories = new Set();
+
+  tools.forEach(tool => {
+    if (tool.category && tool.available !== false) {
+      availableCategories.add(tool.category);
+    }
+  });
+
+  // Check for common missing categories
+  const expectedCategories = [
+    'file-management',
+    'web-search',
+    'code-analysis',
+    'testing',
+    'deployment'
+  ];
+
+  expectedCategories.forEach(category => {
+    if (!availableCategories.has(category)) {
+      gaps.push(category);
+    }
+  });
+
+  return gaps.length > 0 ? gaps : [];
+}
+
+/**
+ * Categorize tools by type
+ */
+function categorizeTools(tools) {
+  if (!tools || !Array.isArray(tools)) return {};
+
+  const categorized = {};
+
+  tools.forEach(tool => {
+    const category = tool.category || 'Other';
+    if (!categorized[category]) {
+      categorized[category] = 0;
+    }
+    if (tool.available !== false) {
+      categorized[category]++;
+    }
+  });
+
+  return categorized;
 }
 
 export default CapabilitiesSection;

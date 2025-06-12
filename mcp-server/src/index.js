@@ -41,12 +41,19 @@ class GuidantEvolutionServer {
 	 * Initialize the MCP server with AI coordination tools
 	 */
 	async init() {
-		if (this.initialized) return;
+		if (this.initialized) {
+			console.log('🔄 MCP server already initialized');
+			return;
+		}
+
+		console.log('🚀 Initializing Guidant Evolution MCP server...');
 
 		// Register all Guidant tools (modular architecture)
+		console.log('📋 Registering MCP tools...');
 		registerAllGuidantTools(this.server);
 
 		this.initialized = true;
+		console.log('✅ MCP server initialization complete');
 		return this;
 	}
 
@@ -54,15 +61,23 @@ class GuidantEvolutionServer {
 	 * Start the MCP server
 	 */
 	async start() {
+		console.log('🌟 Starting Guidant Evolution MCP server...');
+
 		if (!this.initialized) {
 			await this.init();
 		}
+
+		console.log('🔌 Starting FastMCP server with stdio transport...');
 
 		// Start the FastMCP server
 		await this.server.start({
 			transportType: 'stdio',
 			timeout: 120000 // 2 minutes timeout
 		});
+
+		console.log('🎯 MCP server is running and ready for connections!');
+		console.log('📡 Transport: stdio');
+		console.log('⏱️  Timeout: 2 minutes');
 
 		return this;
 	}

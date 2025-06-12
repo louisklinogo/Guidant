@@ -4,11 +4,7 @@
       "user_research",
       "market_analysis"
     ],
-    "status": "pending",
-    "completed": [
-      "market_analysis"
-    ],
-    "lastUpdated": "2025-06-08T03:23:22.383Z"
+    "status": "pending"
   },
   "requirements": {
     "required": [

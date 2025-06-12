@@ -9,13 +9,23 @@ import path from 'path';
 
 async function testMCPConfig() {
     console.log('🧪 Testing MCP Server Configuration...\n');
-    
-    const serverPath = path.resolve('../mcp-server/server.js');
+
+    // Use correct server path relative to project root
+    const serverPath = path.resolve('./mcp-server/server.js');
     console.log(`Server path: ${serverPath}`);
-    
+
+    // Check if server file exists first
+    try {
+        await import('fs').then(fs => fs.promises.access(serverPath));
+    } catch (error) {
+        console.log('❌ Server file not found at:', serverPath);
+        console.log('📝 Expected MCP server at ./mcp-server/server.js');
+        return;
+    }
+
     // Test if server starts
     const server = spawn('node', [serverPath], {
-        cwd: path.resolve('..'),
+        cwd: process.cwd(),
         stdio: ['pipe', 'pipe', 'pipe']
     });
     

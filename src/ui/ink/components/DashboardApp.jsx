@@ -9,7 +9,6 @@ import { HeaderSection } from './HeaderSection.jsx';
 import { ProgressSection } from './ProgressSection.jsx';
 import { CapabilitiesSection } from './CapabilitiesSection.jsx';
 import { TasksSection } from './TasksSection.jsx';
-import { MultiPaneLayout } from '../layouts/MultiPaneLayout.jsx';
 
 /**
  * Pure Dashboard Layout Component - No side effects, just rendering
@@ -139,93 +138,70 @@ export function InteractiveDashboardContainer({
   );
 }
 
-/**
- * Multi-Pane Dashboard Container - New VS Code-inspired multi-pane interface
- * Provides enhanced workflow orchestration with collapsible panels
- */
-export function MultiPaneDashboardContainer({
-  projectState,
-  workflowState,
-  preset = 'development',
-  terminalDimensions,
-  compact = false,
-  onPaneUpdate = () => {},
-  onLayoutChange = () => {},
-  onKeyboardAction = () => {}
-}) {
-  return (
-    <MultiPaneLayout
-      projectState={projectState}
-      workflowState={workflowState}
-      preset={preset}
-      terminalDimensions={terminalDimensions}
-      compact={compact}
-      interactive={true}
-      onPaneUpdate={onPaneUpdate}
-      onLayoutChange={onLayoutChange}
-      onKeyboardAction={onKeyboardAction}
-    />
-  );
-}
+
 
 /**
- * Legacy DashboardApp Component - Maintains backward compatibility
- * @deprecated Use DashboardLayout, LiveDashboardContainer, InteractiveDashboardContainer, or MultiPaneDashboardContainer instead
+ * Intelligent Dashboard Component - Single adaptive dashboard
+ * Automatically adapts to context following TaskMaster's single-focus approach
+ *
+ * Features:
+ * - Auto-detects if live updates are needed
+ * - Shows interactive elements when terminal supports it
+ * - Adapts layout to terminal size
+ * - Single prop for intelligent behavior
  */
 export function DashboardApp({
   projectState,
   workflowState,
-  live = false,
+  autoAdapt = true,
   refreshInterval = 5000,
   compact = false,
-  selectedSection = 0,
-  interactive = false,
-  multiPane = false,
-  preset = 'development',
-  terminalDimensions
+  selectedSection = 0
 }) {
-  // Route to multi-pane layout if requested
-  if (multiPane) {
-    return (
-      <MultiPaneDashboardContainer
-        projectState={projectState}
-        workflowState={workflowState}
-        preset={preset}
-        terminalDimensions={terminalDimensions}
-        compact={compact}
-      />
-    );
-  }
+  // Get terminal capabilities
+  const terminalWidth = process.stdout.columns || 80;
+  const terminalHeight = process.stdout.rows || 24;
+  const supportsInteraction = process.stdin.isTTY && process.stdout.isTTY;
 
-  // Route to appropriate component based on props
-  if (live) {
+  // Auto-detect optimal mode based on context
+  const shouldAutoRefresh = autoAdapt && (
+    workflowState?.currentPhase === 'implementation' ||
+    workflowState?.currentPhase === 'deployment' ||
+    projectState?.activeProcesses > 0
+  );
+
+  const shouldBeInteractive = autoAdapt && supportsInteraction && terminalWidth >= 80;
+  const shouldBeCompact = autoAdapt && (terminalWidth < 100 || terminalHeight < 20);
+
+  // Single intelligent dashboard that adapts automatically
+  if (shouldAutoRefresh) {
     return (
       <LiveDashboardContainer
         projectState={projectState}
         workflowState={workflowState}
         refreshInterval={refreshInterval}
-        compact={compact}
+        compact={shouldBeCompact}
       />
     );
   }
 
-  if (interactive) {
+  if (shouldBeInteractive) {
     return (
       <InteractiveDashboardContainer
         projectState={projectState}
         workflowState={workflowState}
-        compact={compact}
+        compact={shouldBeCompact}
         selectedSection={selectedSection}
       />
     );
   }
 
-  // Default to pure layout
+  // Default to pure layout with intelligent sizing
   return (
     <DashboardLayout
       projectState={projectState}
       workflowState={workflowState}
-      compact={compact}
+      compact={shouldBeCompact}
     />
   );
 }

@@ -74,10 +74,13 @@ export function registerWorkflowControlTools(server) {
 				// Get current workflow state
 				const currentState = await getCurrentWorkflowState(projectRoot);
 
+				// Enhance task with focus display context
+				const enhancedTask = await enhanceTaskForFocusDisplay(task, currentState, projectRoot);
+
 				// Build response - include full state if requested
 				const response = {
 					success: true,
-					task,
+					task: enhancedTask,
 					currentState
 				};
 
@@ -237,4 +240,126 @@ function getNextMilestone(workflowState) {
 		nextPhase: phaseDefinition?.nextPhase,
 		description: phaseDefinition?.description
 	};
+}
+
+/**
+ * Enhance task with additional context for focus display
+ */
+async function enhanceTaskForFocusDisplay(task, workflowState, projectRoot) {
+	if (!task) return task;
+
+	try {
+		// Add workflow context
+		const enhancedTask = {
+			...task,
+			workflowContext: {
+				currentPhase: workflowState.currentPhase?.phase,
+				totalPhases: Object.keys(workflowState.phases || {}).length,
+				overallProgress: calculateOverallProgress(workflowState.phases),
+				nextPhase: getNextPhaseFromState(workflowState),
+				readyToAdvance: await checkPhaseReadiness(workflowState, projectRoot)
+			}
+		};
+
+		// Add dependencies if available
+		if (task.dependencies) {
+			enhancedTask.dependencies = await enhanceDependencies(task.dependencies, projectRoot);
+		}
+
+		// Add contextual actions
+		enhancedTask.suggestedActions = generateTaskActions(task, workflowState);
+
+		return enhancedTask;
+	} catch (error) {
+		console.warn('Failed to enhance task for focus display:', error.message);
+		return task;
+	}
+}
+
+/**
+ * Get next phase from workflow state
+ */
+function getNextPhaseFromState(workflowState) {
+	if (!workflowState.phases || !workflowState.currentPhase) return null;
+
+	const phaseNames = Object.keys(workflowState.phases);
+	const currentIndex = phaseNames.indexOf(workflowState.currentPhase.phase);
+
+	if (currentIndex >= 0 && currentIndex < phaseNames.length - 1) {
+		return phaseNames[currentIndex + 1];
+	}
+
+	return null;
+}
+
+/**
+ * Check if current phase is ready to advance
+ */
+async function checkPhaseReadiness(workflowState, projectRoot) {
+	try {
+		const phaseCompletion = await checkPhaseCompletion(workflowState.currentPhase?.phase, projectRoot);
+		return phaseCompletion.isComplete;
+	} catch (error) {
+		return false;
+	}
+}
+
+/**
+ * Enhance dependencies with status information
+ */
+async function enhanceDependencies(dependencies, projectRoot) {
+	if (!Array.isArray(dependencies)) return [];
+
+	return dependencies.map(dep => ({
+		...dep,
+		status: dep.status || 'pending',
+		title: dep.title || dep.id || 'Unknown dependency'
+	}));
+}
+
+/**
+ * Generate contextual actions for task
+ */
+function generateTaskActions(task, workflowState) {
+	const actions = [];
+	const status = task.status || 'pending';
+	const currentPhase = workflowState.currentPhase?.phase;
+
+	// Status-based actions
+	if (status === 'pending') {
+		actions.push({
+			description: 'Start working on this task',
+			command: 'guidant progress --status=in-progress',
+			type: 'primary'
+		});
+	} else if (status === 'in-progress') {
+		actions.push({
+			description: 'Report progress update',
+			command: 'guidant progress --update',
+			type: 'primary'
+		});
+		actions.push({
+			description: 'Mark task as completed',
+			command: 'guidant progress --status=completed',
+			type: 'success'
+		});
+	}
+
+	// Phase-based actions
+	if (currentPhase) {
+		actions.push({
+			description: 'Check phase completion status',
+			command: 'guidant status --phase',
+			type: 'info'
+		});
+	}
+
+	// General actions
+	actions.push({
+		description: 'View full project status',
+		command: 'guidant status',
+		type: 'info'
+	});
+
+	return actions.slice(0, 4); // Limit to 4 actions
 }

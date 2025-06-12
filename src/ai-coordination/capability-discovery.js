@@ -49,8 +49,13 @@ import { discoverCapabilitiesWithAI } from '../ai-integration/capability-analyze
 export async function discoverCapabilities(availableTools, projectRoot = process.cwd(), options = {}) {
   const toolNames = availableTools.map(tool => typeof tool === 'string' ? tool : tool.name);
 
-  // Skip AI analysis in test mode or when explicitly disabled
-  const skipAI = options.skipAI || process.env.NODE_ENV === 'test' || process.env.GUIDANT_TEST_MODE === 'true';
+  // Only skip AI analysis in explicit test environments or when explicitly disabled
+  const skipAI = options.skipAI || (
+    (process.env.NODE_ENV === 'test' ||
+     process.env.GUIDANT_TEST_MODE === 'true' ||
+     process.env.CI === 'true') &&
+    process.env.GUIDANT_FORCE_AI !== 'true'
+  );
 
   if (!skipAI) {
     // Try AI-enhanced capability discovery first

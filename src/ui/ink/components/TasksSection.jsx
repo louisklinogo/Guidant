@@ -9,35 +9,17 @@ import { Box, Text, Newline } from 'ink';
 /**
  * Tasks Section Component
  */
-export function TasksSection({ 
-  projectState, 
-  workflowState, 
-  compact = false, 
-  selected = false 
+export function TasksSection({
+  projectState,
+  workflowState,
+  compact = false,
+  selected = false
 }) {
-  // Mock task data - replace with actual task generation
-  const currentTask = {
-    id: 'TASK-001',
-    title: 'Implement Professional Status Dashboard',
-    description: 'Create beautiful terminal UI components with Ink and legacy fallback',
-    priority: 'high',
-    status: 'in-progress',
-    phase: workflowState?.currentPhase?.phase || 'implementation',
-    progress: 75,
-    subtasks: [
-      { id: 'SUB-001', title: 'Create UI directory structure', status: 'completed' },
-      { id: 'SUB-002', title: 'Implement banner component', status: 'completed' },
-      { id: 'SUB-003', title: 'Implement progress bar component', status: 'completed' },
-      { id: 'SUB-004', title: 'Create Ink renderer', status: 'in-progress' },
-      { id: 'SUB-005', title: 'Test dashboard command', status: 'pending' }
-    ]
-  };
+  // Generate actual task based on current project state and workflow
+  const currentTask = generateCurrentTask(projectState, workflowState);
 
-  const upcomingTasks = [
-    { id: 'TASK-002', title: 'Add interactive navigation', priority: 'medium', phase: 'enhancement' },
-    { id: 'TASK-003', title: 'Implement live dashboard mode', priority: 'medium', phase: 'enhancement' },
-    { id: 'TASK-004', title: 'Create comprehensive documentation', priority: 'low', phase: 'documentation' }
-  ];
+  // Generate upcoming tasks based on project phase and workflow
+  const upcomingTasks = generateUpcomingTasks(projectState, workflowState);
 
   const borderColor = selected ? 'cyan' : 'gray';
 
@@ -268,6 +250,155 @@ function createTaskProgressBar(percent, length = 20) {
       <Text color={color}> {percent}%</Text>
     </Text>
   );
+}
+
+/**
+ * Generate current task based on project state and workflow
+ */
+function generateCurrentTask(projectState, workflowState) {
+  const currentPhase = workflowState?.currentPhase?.phase || 'concept';
+  const projectName = projectState?.config?.name || 'Project';
+  const progress = workflowState?.currentPhase?.progress || 0;
+
+  // Generate task based on current phase
+  const phaseTaskMap = {
+    concept: {
+      title: `Define ${projectName} Vision and Requirements`,
+      description: `Research market needs, define user personas, and establish the core value proposition for ${projectName}.`,
+      priority: 'high'
+    },
+    requirements: {
+      title: `Create Detailed Requirements for ${projectName}`,
+      description: `Document functional and non-functional requirements, create user stories, and define acceptance criteria.`,
+      priority: 'high'
+    },
+    design: {
+      title: `Design User Experience for ${projectName}`,
+      description: `Create wireframes, user flows, and visual designs that deliver an excellent user experience.`,
+      priority: 'high'
+    },
+    architecture: {
+      title: `Design System Architecture for ${projectName}`,
+      description: `Design the technical architecture, choose technology stack, and plan system components.`,
+      priority: 'high'
+    },
+    implementation: {
+      title: `Implement Core Features for ${projectName}`,
+      description: `Build the core features, implement business logic, and ensure quality through testing.`,
+      priority: 'high'
+    },
+    deployment: {
+      title: `Deploy and Launch ${projectName}`,
+      description: `Deploy to production, set up monitoring, and prepare for user launch.`,
+      priority: 'high'
+    }
+  };
+
+  const taskTemplate = phaseTaskMap[currentPhase] || {
+    title: `Continue Development of ${projectName}`,
+    description: `Work on the current phase deliverables for ${projectName}.`,
+    priority: 'medium'
+  };
+
+  return {
+    id: `${currentPhase.toUpperCase()}-001`,
+    title: taskTemplate.title,
+    description: taskTemplate.description,
+    priority: taskTemplate.priority,
+    status: progress > 0 ? 'in-progress' : 'pending',
+    phase: currentPhase,
+    progress: progress,
+    subtasks: generateSubtasks(currentPhase, progress)
+  };
+}
+
+/**
+ * Generate upcoming tasks based on workflow
+ */
+function generateUpcomingTasks(projectState, workflowState) {
+  const currentPhase = workflowState?.currentPhase?.phase || 'concept';
+  const projectName = projectState?.config?.name || 'Project';
+
+  const phaseOrder = ['concept', 'requirements', 'design', 'architecture', 'implementation', 'deployment'];
+  const currentIndex = phaseOrder.indexOf(currentPhase);
+
+  const upcomingTasks = [];
+
+  // Generate tasks for next 2-3 phases
+  for (let i = currentIndex + 1; i < Math.min(currentIndex + 4, phaseOrder.length); i++) {
+    const phase = phaseOrder[i];
+    const phaseTaskMap = {
+      requirements: { title: `Create Requirements for ${projectName}`, priority: 'high' },
+      design: { title: `Design UX for ${projectName}`, priority: 'high' },
+      architecture: { title: `Architect ${projectName} System`, priority: 'high' },
+      implementation: { title: `Build ${projectName} Features`, priority: 'high' },
+      deployment: { title: `Deploy ${projectName}`, priority: 'medium' }
+    };
+
+    const taskInfo = phaseTaskMap[phase];
+    if (taskInfo) {
+      upcomingTasks.push({
+        id: `${phase.toUpperCase()}-001`,
+        title: taskInfo.title,
+        priority: taskInfo.priority,
+        phase: phase
+      });
+    }
+  }
+
+  return upcomingTasks;
+}
+
+/**
+ * Generate subtasks based on phase and progress
+ */
+function generateSubtasks(phase, progress) {
+  const subtaskTemplates = {
+    concept: [
+      { title: 'Research market and competitors', threshold: 0 },
+      { title: 'Define user personas', threshold: 25 },
+      { title: 'Establish value proposition', threshold: 50 },
+      { title: 'Create project vision document', threshold: 75 }
+    ],
+    requirements: [
+      { title: 'Gather functional requirements', threshold: 0 },
+      { title: 'Define non-functional requirements', threshold: 25 },
+      { title: 'Create user stories', threshold: 50 },
+      { title: 'Define acceptance criteria', threshold: 75 }
+    ],
+    design: [
+      { title: 'Create user flow diagrams', threshold: 0 },
+      { title: 'Design wireframes', threshold: 25 },
+      { title: 'Create visual designs', threshold: 50 },
+      { title: 'Validate design with users', threshold: 75 }
+    ],
+    architecture: [
+      { title: 'Choose technology stack', threshold: 0 },
+      { title: 'Design system architecture', threshold: 25 },
+      { title: 'Plan data models', threshold: 50 },
+      { title: 'Create technical specifications', threshold: 75 }
+    ],
+    implementation: [
+      { title: 'Set up development environment', threshold: 0 },
+      { title: 'Implement core features', threshold: 25 },
+      { title: 'Add business logic', threshold: 50 },
+      { title: 'Write tests and documentation', threshold: 75 }
+    ],
+    deployment: [
+      { title: 'Set up production environment', threshold: 0 },
+      { title: 'Configure monitoring', threshold: 25 },
+      { title: 'Deploy application', threshold: 50 },
+      { title: 'Validate production deployment', threshold: 75 }
+    ]
+  };
+
+  const templates = subtaskTemplates[phase] || [];
+
+  return templates.map((template, index) => ({
+    id: `SUB-${String(index + 1).padStart(3, '0')}`,
+    title: template.title,
+    status: progress > template.threshold ? 'completed' : (progress > template.threshold - 25 ? 'in-progress' : 'pending')
+  }));
 }
 
 export default TasksSection;

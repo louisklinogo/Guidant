@@ -11,6 +11,8 @@ import { registerAgentDiscoveryTools } from './agent-registry/agent-discovery.js
 import { registerCapabilityAnalysisTools } from './agent-registry/capability-analysis.js';
 import { registerAdaptiveWorkflowTools } from './workflow-intelligence/adaptive-tools.js';
 import { registerQualityValidationTools } from './quality/quality-validation-tools.js';
+import { registerOrchestrationTools } from './orchestration/orchestration-tools.js';
+import { registerAnalyticsTools } from './analytics/analytics-tools.js';
 
 /**
  * Register all Guidant Evolution MCP tools with the server
@@ -39,6 +41,12 @@ export function registerAllGuidantTools(server) {
 		// Quality validation tools
 		registerQualityValidationTools(server);
 
+		// Tool orchestration tools (MCP-009)
+		registerOrchestrationTools(server);
+
+		// Tool analytics tools (MCP-010)
+		registerAnalyticsTools(server);
+
 		console.log('✅ All Guidant Evolution MCP tools registered successfully');
 		console.log('📊 Tool Categories:');
 		console.log('   • Core Project Management (3 tools)');
@@ -48,7 +56,9 @@ export function registerAllGuidantTools(server) {
 		console.log('   • Capability Analysis (3 tools)');
 		console.log('   • Adaptive Workflow Intelligence (5 tools)');
 		console.log('   • Quality Validation (4 tools)');
-		console.log('   📈 Total: 23 tools registered');
+		console.log('   • Tool Orchestration (8 tools)');
+		console.log('   • Tool Analytics (9 tools)');
+		console.log('   📈 Total: 40 tools registered');
 		
 	} catch (error) {
 		console.error('❌ Error registering Guidant tools:', error);
@@ -94,9 +104,17 @@ export function getToolRegistry() {
 			'quality-validation': {
 				description: 'Content quality validation, scoring, and improvement feedback',
 				tools: ['guidant_validate_deliverable_quality', 'guidant_get_quality_history', 'guidant_get_quality_statistics', 'guidant_configure_quality_system']
+			},
+			'tool-orchestration': {
+				description: 'Multi-tool workflow orchestration and execution management',
+				tools: ['guidant_execute_workflow', 'guidant_get_workflow_status', 'guidant_cancel_workflow', 'guidant_list_workflow_templates', 'guidant_get_workflow_template', 'guidant_create_workflow', 'guidant_validate_workflow', 'guidant_get_orchestrator_metrics']
+			},
+			'tool-analytics': {
+				description: 'Tool usage analytics, performance monitoring, and optimization insights',
+				tools: ['guidant_get_analytics_report', 'guidant_get_tool_metrics', 'guidant_get_usage_patterns', 'guidant_start_monitoring', 'guidant_stop_monitoring', 'guidant_get_performance_summary', 'guidant_record_metric', 'guidant_get_category_metrics', 'guidant_export_analytics']
 			}
 		},
-		totalTools: 27,
-		version: '2.4.0-category-system'
+		totalTools: 40,
+		version: '2.5.0-orchestration-analytics'
 	};
 }

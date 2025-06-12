@@ -380,12 +380,20 @@ async function saveGeneratedTasks(tasks, projectRoot) {
  * @param {string} projectRoot - Project root directory
  */
 async function updateProjectDescription(description, projectRoot) {
-  try {
-    const config = await readProjectFile('PROJECT_CONFIG', projectRoot);
-    config.description = description;
-    config.lastModified = new Date().toISOString();
-    await writeProjectFile('PROJECT_CONFIG', config, projectRoot);
-  } catch (error) {
-    console.warn('Failed to update project description:', error.message);
+  const configResult = await readProjectFile('PROJECT_CONFIG', projectRoot);
+
+  if (!configResult.success) {
+    console.warn('Failed to read project config:', configResult.error);
+    return;
+  }
+
+  const config = configResult.data;
+  config.description = description;
+  config.lastModified = new Date().toISOString();
+
+  const writeResult = await writeProjectFile('PROJECT_CONFIG', config, projectRoot);
+
+  if (!writeResult.success) {
+    console.warn('Failed to update project description:', writeResult.error);
   }
 }

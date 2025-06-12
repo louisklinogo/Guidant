@@ -283,22 +283,37 @@ function analyzeUpgradeOpportunities(state) {
 }
 
 /**
- * Register adaptive workflow commands
+ * Register consolidated adaptive workflow command
+ * Single command with subcommands following TaskMaster approach
  */
 export function registerAdaptiveCommands(program) {
-  program
+  const adaptiveCmd = program
+    .command('adaptive')
+    .description('Workflow management (classify, modes, upgrade)')
+    .action(() => {
+      // Show help when no subcommand provided
+      console.log('Usage: guidant adaptive <subcommand>\n');
+      console.log('Subcommands:');
+      console.log('  classify    Classify project type and get optimal workflow');
+      console.log('  modes       Show available workflow setup modes');
+      console.log('  upgrade     Analyze and upgrade current workflow');
+      console.log('\nUse "guidant adaptive <subcommand> --help" for more information.');
+    });
+
+  // Add subcommands
+  adaptiveCmd
     .command('classify')
     .description('Classify project type and get optimal adaptive workflow')
     .option('-d, --description <text>', 'Project description for AI classification')
     .option('--dry-run', 'Show classification without applying workflow')
     .action(classifyCommand);
 
-  program
+  adaptiveCmd
     .command('modes')
     .description('Show available workflow setup modes')
     .action(modesCommand);
 
-  program
+  adaptiveCmd
     .command('upgrade')
     .description('Analyze and upgrade current workflow')
     .action(upgradeCommand);

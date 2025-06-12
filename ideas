@@ -3,8 +3,6 @@
 
 [] I have an issue with how Tickets are generated
 
-[] Instead of hardcoding models into codebase, cant we have a serperate filee we can define the models and then use them in the codebase? 
-
 []research config and make sure model names, provide info etc is correct
 
 []implementation phase, tass should follows solid principles
@@ -28,10 +26,14 @@
 
 [] .Taskmaster dir covers everything for projects
 
+[] mcp-todo, 2 more
 
-🔥 Great thinking! You're right — **SOLID principles** mainly apply to **Phase 4: Implementation**. But each SDLC phase also has **its own “best practices” or guiding principles** that make your software stronger.
+[] inappropriate use of mockdata
 
----
+[] mockups for ui in cli
+
+[] In guidant, are tasks generated progressively or at the start then the ai agent follows?, help me understand
+
 
 🚀 **SDLC Phases + Matching Design Principles**
 

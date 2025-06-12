@@ -6,46 +6,26 @@
 import { registerStatusCommand } from './status.js';
 import { registerHealthCommand } from './health.js';
 import { registerInitCommand } from './init.js';
-import { registerTestCapabilitiesCommand } from './test-capabilities.js';
 import { registerDashboardCommands } from './dashboard/index.js';
-import { registerDynamicDashboardCommands } from './dynamic-dashboard.js';
 import { registerAdaptiveCommands } from './adaptive.js';
-import { registerAliases } from './aliases.js';
-import { registerDemoCommand } from './demo-multi-pane.js';
 
 /**
- * Register all commands with the CLI program
+ * Register essential commands with the CLI program
+ * Streamlined to 6 core commands following TaskMaster approach
  */
 export function registerAllCommands(program) {
-  // Core commands
-  registerInitCommand(program);
-  registerStatusCommand(program);
-  registerHealthCommand(program);
-
-  // Dashboard commands
-  registerDashboardCommands(program);
-  registerDynamicDashboardCommands(program);
-
-  // Demo command
-  registerDemoCommand(program);
-
-  // Adaptive workflow commands
-  registerAdaptiveCommands(program);
-
-  // Analysis commands
-  registerTestCapabilitiesCommand(program);
-
-  // Command aliases and shortcuts
-  registerAliases(program);
-
-  // Future commands
-  // registerDeployCommand(program);
-  // registerGenerateCommand(program);
-  // registerReportsCommand(program);
+  // Essential commands only (6 total)
+  registerInitCommand(program);           // 1. guidant init
+  registerStatusCommand(program);         // 2. guidant status
+  registerDashboardCommands(program);     // 3. guidant dashboard
+  registerHealthCommand(program);         // 4. guidant health
+  registerAdaptiveCommands(program);      // 5. guidant adaptive (consolidated)
+  // 6. guidant help (built-in commander help)
 }
 
 /**
- * Get list of available commands for help
+ * Get list of essential commands for help
+ * Streamlined to 6 core commands with clear, single purposes
  */
 export function getAvailableCommands() {
   return [
@@ -56,18 +36,28 @@ export function getAvailableCommands() {
     },
     {
       name: 'status',
-      description: 'Show current project status and progress',
+      description: 'Show current state and next task',
+      category: 'Core'
+    },
+    {
+      name: 'dashboard',
+      description: 'Single intelligent dashboard (auto-adapts)',
       category: 'Core'
     },
     {
       name: 'health',
-      description: 'Check project file health and integrity',
+      description: 'System health check',
       category: 'Core'
     },
     {
-      name: 'test-capabilities',
-      description: 'Discover and analyze AI agent capabilities',
-      category: 'Analysis'
+      name: 'adaptive',
+      description: 'Workflow management (classify, modes, upgrade)',
+      category: 'Workflow'
+    },
+    {
+      name: 'help',
+      description: 'Contextual help',
+      category: 'Core'
     }
   ];
 }

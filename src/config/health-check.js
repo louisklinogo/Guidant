@@ -181,7 +181,7 @@ function generateRecommendations(results) {
     title: 'Regular Model Registry Updates',
     description: 'Keep your model registry up to date with latest models',
     action: 'Run model registry updater monthly',
-    command: 'node src/config/model-registry-updater.js'
+    command: 'bun run src/config/model-registry-updater.js'
   });
   
   // Recommend CI/CD integration
@@ -190,7 +190,7 @@ function generateRecommendations(results) {
     title: 'Automated Configuration Validation',
     description: 'Add config validation to your CI/CD pipeline',
     action: 'Include health check in automated tests',
-    command: 'node src/config/health-check.js'
+    command: 'bun run src/config/health-check.js'
   });
   
   // Model-specific recommendations

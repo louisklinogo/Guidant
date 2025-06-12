@@ -11,7 +11,8 @@ import { createDashboardError, ERROR_TYPES, withErrorHandling } from './error-ha
 export const RENDER_MODES = {
   STATIC: 'static',
   LIVE: 'live',
-  INTERACTIVE: 'interactive'
+  INTERACTIVE: 'interactive',
+  INTELLIGENT: 'intelligent' // New single adaptive mode
 };
 
 /**
@@ -32,9 +33,10 @@ export class DashboardRendererFactory {
     
     // Renderer module mapping
     const rendererModules = {
-      [RENDER_MODES.STATIC]: () => import('../../../ui/ink/renderers/static-renderer.tsx'),
-      [RENDER_MODES.LIVE]: () => import('../../../ui/ink/renderers/live-renderer.tsx'),
-      [RENDER_MODES.INTERACTIVE]: () => import('../../../ui/ink/renderers/interactive-renderer.tsx')
+      [RENDER_MODES.STATIC]: () => import('../../../ui/ink/renderers/static-renderer.js'),
+      [RENDER_MODES.LIVE]: () => import('../../../ui/ink/renderers/live-renderer.js'),
+      [RENDER_MODES.INTERACTIVE]: () => import('../../../ui/ink/renderers/interactive-renderer.js'),
+      [RENDER_MODES.INTELLIGENT]: () => import('../../../ui/ink/renderers/intelligent-renderer.js')
     };
     
     return withErrorHandling(
@@ -61,7 +63,8 @@ export class DashboardRendererFactory {
     const functionMap = {
       [RENDER_MODES.STATIC]: 'renderStaticDashboard',
       [RENDER_MODES.LIVE]: 'renderLiveDashboard',
-      [RENDER_MODES.INTERACTIVE]: 'renderInteractiveDashboard'
+      [RENDER_MODES.INTERACTIVE]: 'renderInteractiveDashboard',
+      [RENDER_MODES.INTELLIGENT]: 'renderIntelligentDashboard'
     };
     
     const functionName = functionMap[mode];

@@ -295,10 +295,10 @@ describe('Enhanced Context System - Unit Tests', () => {
     it('should handle missing project gracefully', async () => {
       const source = new ProjectStateContextSource();
       const context = await source.getContext('/nonexistent/path', 'requirements', 'prd_complete');
-      
+
       expect(context.success).toBe(true);
       expect(context.metadata.isEmpty).toBe(true);
-      expect(context.data.projectName).toBe('Unknown Project');
+      expect(context.data.projectName).toBe(null); // Updated to match new behavior - null for missing files
     });
   });
 

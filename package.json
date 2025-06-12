@@ -24,8 +24,8 @@
     "format:check": "biome format .",
     "lint": "biome lint .",
     "lint:fix": "biome lint . --write",
-    "config:check": "node src/config/health-check.js",
-    "config:diagnose": "node diagnose-config-issues.js"
+    "config:check": "bun run src/config/health-check.js",
+    "config:diagnose": "bun run diagnose-config-issues.js"
   },
   "keywords": [
     "ai",
@@ -79,15 +79,9 @@
     "bun": ">=1.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.27.4",
-    "@babel/node": "^7.27.1",
-    "@babel/preset-env": "^7.27.2",
-    "@babel/preset-react": "^7.27.1",
-    "@babel/register": "^7.27.1",
     "@biomejs/biome": "^1.9.4",
     "execa": "^9.6.0",
     "ink-testing-library": "^4.0.0",
-    "mock-fs": "^5.5.0",
-    "tsx": "^4.19.4"
+    "mock-fs": "^5.5.0"
   }
 }

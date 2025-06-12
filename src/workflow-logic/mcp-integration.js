@@ -251,8 +251,13 @@ async function executeAgentCoordinationTool(toolName, params) {
   
   switch (toolName) {
     case 'guidant_discover_agent':
-      // Use test mode to skip AI analysis in tests
-      const isTestMode = process.env.NODE_ENV === 'test' || process.env.GUIDANT_TEST_MODE === 'true';
+      // Only skip AI analysis in explicit test environments
+      const isTestMode = (
+        process.env.NODE_ENV === 'test' ||
+        process.env.GUIDANT_TEST_MODE === 'true' ||
+        process.env.CI === 'true'
+      ) && process.env.GUIDANT_FORCE_AI !== 'true';
+
       const capabilities = await discoverCapabilities(params.availableTools, projectRoot, { skipAI: isTestMode });
       return {
         agentId: `dashboard-agent-${Date.now()}`,

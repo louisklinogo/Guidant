@@ -42,11 +42,23 @@ import {
  */
 export async function initializeProjectStructure(projectRoot = process.cwd()) {
   const guidantPath = path.join(projectRoot, GUIDANT_DIR);
-  
+
+  try {
+    // Check if we have write permissions to the project root
+    await fs.access(projectRoot, fs.constants.W_OK);
+  } catch (error) {
+    if (error.code === 'EACCES') {
+      throw new Error(`Permission denied: Cannot write to directory '${projectRoot}'. Please check file permissions or run with appropriate privileges.`);
+    } else if (error.code === 'ENOENT') {
+      throw new Error(`Directory not found: '${projectRoot}' does not exist.`);
+    }
+    throw new Error(`Cannot access directory '${projectRoot}': ${error.message}`);
+  }
+
   // Create directory structure
   const directories = [
     'project',
-    'workflow', 
+    'workflow',
     'context',
     'deliverables',
     'deliverables/research',
@@ -57,14 +69,23 @@ export async function initializeProjectStructure(projectRoot = process.cwd()) {
     'deliverables/deployment',
     'reports',
     'reports/progress-reports',
-    'reports/quality-reports', 
+    'reports/quality-reports',
     'reports/business-reports',
     'ai',
     'ai/task-tickets'
   ];
 
   for (const dir of directories) {
-    await fs.mkdir(path.join(guidantPath, dir), { recursive: true });
+    try {
+      await fs.mkdir(path.join(guidantPath, dir), { recursive: true });
+    } catch (error) {
+      if (error.code === 'EACCES') {
+        throw new Error(`Permission denied: Cannot create directory '${dir}' in '${guidantPath}'. Please check file permissions.`);
+      } else if (error.code === 'ENOSPC') {
+        throw new Error(`Insufficient disk space: Cannot create directory '${dir}' in '${guidantPath}'.`);
+      }
+      throw new Error(`Failed to create directory '${dir}': ${error.message}`);
+    }
   }
 
   // Initialize default configuration files
@@ -133,7 +154,12 @@ async function initializeDefaultFiles(projectRoot) {
     [SESSIONS]: [],
     [USER_FEEDBACK]: [],
     [AI_CAPABILITIES]: {},
-    [CURRENT_ROLE]: {}
+    [CURRENT_ROLE]: {
+      role: "research_agent",
+      assignedAt: new Date().toISOString(),
+      capabilities: [],
+      confidence: 0.8
+    }
   };
 
   for (const [filePath, content] of Object.entries(defaultFiles)) {

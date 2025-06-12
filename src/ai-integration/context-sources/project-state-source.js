@@ -24,18 +24,23 @@ export class ProjectStateContextSource extends IContextSource {
     try {
       // Get project state
       const projectState = await getProjectState(projectRoot);
-      
+
+      // Check if project is initialized
+      if (!projectState.isInitialized) {
+        return this.getEmptyContext(phase, deliverable);
+      }
+
       // Get project file structure
-      const fileStructure = this.includeFileStructure 
+      const fileStructure = this.includeFileStructure
         ? await this.getProjectFileStructure(projectRoot)
         : { files: [], directories: [] };
 
       // Get phase progress information
       const phaseProgress = this.analyzePhaseProgress(projectState, phase);
-      
+
       // Get capability information
       const capabilities = this.extractCapabilities(projectState);
-      
+
       // Get project configuration insights
       const configInsights = this.analyzeProjectConfig(projectState);
 
@@ -315,8 +320,30 @@ export class ProjectStateContextSource extends IContextSource {
 
   /**
    * Get empty context when project state is unavailable
+   * In production, this should indicate missing configuration rather than providing defaults
    */
   getEmptyContext(phase, deliverable) {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (isProduction) {
+      // In production, return error state instead of placeholder data
+      return {
+        success: false,
+        source: 'project_state',
+        priority: this.priority,
+        phase,
+        deliverable,
+        error: 'Project not initialized. Run "guidant init" to set up the project.',
+        data: null,
+        metadata: {
+          retrievedAt: new Date().toISOString(),
+          isEmpty: true,
+          requiresInitialization: true
+        }
+      };
+    }
+
+    // In development, provide minimal context with clear indicators
     return {
       success: true,
       source: 'project_state',
@@ -324,9 +351,9 @@ export class ProjectStateContextSource extends IContextSource {
       phase,
       deliverable,
       data: {
-        projectName: 'Unknown Project',
-        projectDescription: '',
-        projectType: 'web_app',
+        projectName: null, // Explicitly null instead of placeholder
+        projectDescription: null,
+        projectType: null, // Will be determined during initialization
         currentPhase: phase,
         phaseProgress: { currentPhase: phase, completedCount: 0, totalPhases: 6, progressPercentage: 0 },
         completedPhases: [],
@@ -338,21 +365,23 @@ export class ProjectStateContextSource extends IContextSource {
         availableTools: [],
         detectedCapabilities: [],
         toolCategories: {},
-        configurationHealth: 'poor',
-        missingConfiguration: ['project configuration'],
-        recommendations: ['Initialize Guidant project'],
+        configurationHealth: 'uninitialized',
+        missingConfiguration: ['project initialization', 'project configuration'],
+        recommendations: ['Run "guidant init" to initialize the project'],
         workflowState: {},
         qualityGates: {},
         projectInitialized: false,
         lastUpdated: new Date().toISOString(),
-        guidantVersion: 'unknown'
+        guidantVersion: 'unknown',
+        _isPlaceholder: true // Flag to indicate this is placeholder data
       },
       metadata: {
         retrievedAt: new Date().toISOString(),
-        projectHealth: 0.1,
-        maturity: 'early',
-        complexity: 'low',
-        isEmpty: true
+        projectHealth: 0.0, // Zero health for uninitialized project
+        maturity: 'uninitialized',
+        complexity: 'unknown',
+        isEmpty: true,
+        isPlaceholder: true
       }
     };
   }

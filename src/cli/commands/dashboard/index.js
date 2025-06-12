@@ -9,23 +9,12 @@ import { renderProjectDashboard } from '../../../ui/dashboard-renderer.js';
 import { StateManager } from './state-manager.js';
 import { DashboardRendererFactory, determineRenderMode, validateRenderOptions } from './renderer-factory.js';
 import { handleDashboardError } from './error-handler.js';
-import { dynamicDashboardCommand } from '../dynamic-dashboard.js';
 
 /**
  * Main Dashboard Command - Enhanced with dynamic mode support
  */
 export async function dashboardCommand(options = {}) {
   try {
-    // Check if dynamic mode is requested
-    if (options.dynamic || options.preset || options.demo) {
-      console.log(chalk.blue('🚀 Using Dynamic Layout System...'));
-      return await dynamicDashboardCommand({
-        ...options,
-        preset: options.preset || 'quick', // Default to quick mode for dashboard command
-        demo: options.demo || true // Enable demo mode by default
-      });
-    }
-
     // 1. Validate environment and options
     await requireProject();
     validateRenderOptions(options);
@@ -71,33 +60,17 @@ export async function dashboardCommand(options = {}) {
 }
 
 /**
- * Live Dashboard Command - Enhanced with dynamic mode support
+ * Live Dashboard Command - Simplified for single intelligent mode
  */
 export async function liveDashboardCommand(options = {}) {
-  // Check if dynamic mode is requested
-  if (options.dynamic || options.preset || options.demo) {
-    console.log(chalk.blue('🚀 Using Dynamic Layout System (Live Mode)...'));
-    return await dynamicDashboardCommand({
-      ...options,
-      preset: options.preset || 'development', // Default to development mode for live command
-      demo: options.demo || true // Enable demo mode by default
-    });
-  }
-
   return dashboardCommand({ ...options, live: true });
 }
 
 /**
- * Interactive Dashboard Command - Enhanced with dynamic mode support
+ * Interactive Dashboard Command - Simplified for single intelligent mode
  */
 export async function interactiveDashboardCommand(options = {}) {
-  // Interactive mode always uses dynamic system
-  console.log(chalk.blue('🚀 Using Dynamic Layout System (Interactive Mode)...'));
-  return await dynamicDashboardCommand({
-    ...options,
-    preset: options.preset || 'monitoring', // Default to monitoring mode for interactive
-    demo: options.demo || true // Enable demo mode by default
-  });
+  return dashboardCommand({ ...options, interactive: true });
 }
 
 /**
@@ -155,19 +128,16 @@ function showUpgradePrompt() {
  * Register dashboard commands with commander
  */
 export function registerDashboardCommands(program) {
-  // Main dashboard command
+  // Main dashboard command - Simplified for single intelligent mode
   program
     .command('dashboard')
     .alias('dash')
-    .description('Show beautiful adaptive status dashboard')
+    .description('Show intelligent status dashboard with TaskMaster-style UI')
     .option('-c, --compact', 'Show compact view')
     .option('--no-header', 'Hide header banner')
     .option('--no-progress', 'Hide phase progress')
     .option('--no-capabilities', 'Hide AI capabilities')
     .option('--no-tasks', 'Hide task overview')
-    .option('-d, --dynamic', 'Use dynamic layout system')
-    .option('-p, --preset <preset>', 'Layout preset (quick|development|monitoring|debug)')
-    .option('--demo', 'Show rich demo with mock data')
     .action(dashboardCommand);
 
   // Live dashboard command
@@ -176,9 +146,6 @@ export function registerDashboardCommands(program) {
     .description('Live dashboard with auto-refresh')
     .option('-i, --interval <ms>', 'Refresh interval in milliseconds', '5000')
     .option('-c, --compact', 'Show compact view')
-    .option('-d, --dynamic', 'Use dynamic layout system')
-    .option('-p, --preset <preset>', 'Layout preset (quick|development|monitoring|debug)')
-    .option('--demo', 'Show rich demo with mock data')
     .action(liveDashboardCommand);
 
   // Interactive dashboard command
@@ -187,7 +154,5 @@ export function registerDashboardCommands(program) {
     .alias('int')
     .description('Interactive dashboard with keyboard navigation')
     .option('-c, --compact', 'Show compact view')
-    .option('-p, --preset <preset>', 'Layout preset (quick|development|monitoring|debug)')
-    .option('--demo', 'Show rich demo with mock data')
     .action(interactiveDashboardCommand);
 }

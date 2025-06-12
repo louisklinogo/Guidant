@@ -46,7 +46,7 @@ export function registerProjectManagementTools(server) {
 	// Project initialization
 	server.addTool({
 		name: 'guidant_init_project',
-		description: 'Initialize a new Guidant Evolution project with structured workflow and optional PRD processing',
+		description: 'Initialize a new Guidant project with structured workflow and optional PRD processing',
 		parameters: z.object({
 			projectName: projectNameSchema,
 			description: projectDescriptionSchema,
@@ -56,7 +56,7 @@ export function registerProjectManagementTools(server) {
 		execute: async ({ projectName, description = '', availableTools, prdContent }) => {
 			try {
 				const projectRoot = process.cwd();
-				
+
 				// Check if already initialized
 				if (await isProjectInitialized(projectRoot)) {
 					return formatErrorResponse(
@@ -65,8 +65,33 @@ export function registerProjectManagementTools(server) {
 					);
 				}
 
-				// Initialize project structure
-				await initializeProjectStructure(projectRoot);
+				// Initialize project structure with enhanced error handling
+				try {
+					await initializeProjectStructure(projectRoot);
+				} catch (structureError) {
+					// Provide specific guidance based on error type
+					if (structureError.message.includes('Permission denied')) {
+						return formatErrorResponse(
+							'Permission denied during project initialization',
+							'Please check file permissions or run with appropriate privileges. You may need to run as administrator/sudo or change directory ownership.',
+							{
+								error: structureError.message,
+								suggestions: [
+									'Check if the current directory is writable',
+									'Run with elevated permissions if necessary',
+									'Ensure no files are locked by other processes'
+								]
+							}
+						);
+					} else if (structureError.message.includes('disk space')) {
+						return formatErrorResponse(
+							'Insufficient disk space for project initialization',
+							'Free up disk space and try again.',
+							{ error: structureError.message }
+						);
+					}
+					throw structureError; // Re-throw other errors
+				}
 				
 				// Discover AI capabilities
 				const capabilities = await discoverCapabilities(availableTools, projectRoot);

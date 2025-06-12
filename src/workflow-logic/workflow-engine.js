@@ -84,7 +84,7 @@ export async function getCurrentWorkflowState(projectRoot = process.cwd()) {
     currentPhase,
     qualityGates,
     currentRole,
-    phaseDefinition: PHASE_DEFINITIONS[currentPhase.phase]
+    phaseDefinition: PHASE_DEFINITIONS[currentPhase?.phase || 'concept']
   };
 }
 
@@ -133,7 +133,7 @@ async function generatePhaseTask(state, capabilities, projectRoot) {
   const task = await generateSpecificTask(currentPhase, bestRole, capabilities, projectRoot);
   
   // Update current role if changed
-  if (state.currentRole.role !== bestRole.role) {
+  if (!state.currentRole.role || state.currentRole.role !== bestRole.role) {
     await writeProjectFile(CURRENT_ROLE, {
       role: bestRole.role,
       assignedAt: new Date().toISOString(),

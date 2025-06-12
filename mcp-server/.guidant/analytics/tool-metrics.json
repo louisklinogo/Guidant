@@ -1,0 +1,14 @@
+{
+  "toolUsage": {},
+  "performance": {},
+  "errors": {},
+  "system": {
+    "totalExecutions": 0,
+    "totalErrors": 0,
+    "averageResponseTime": 0,
+    "peakConcurrency": 0,
+    "currentConcurrency": 0,
+    "uptime": 1749685880281
+  },
+  "timestamp": "2025-06-12T03:52:36.134Z"
+}
