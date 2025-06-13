@@ -18,7 +18,7 @@
 
 import { DeliverableContentAnalyzer } from '../data-processing/deliverable-analyzer.js';
 import { readProjectFile, writeProjectFile } from '../file-management/project-structure.js';
-import { PHASE_DEFINITIONS } from './workflow-engine.js';
+import { PHASE_DEFINITIONS } from './phase-definitions.js';
 import { getProjectTypeConfig, validateTechStack, getTransformationRules } from '../config/project-types.js';
 import {
   TransformationInputSchema,

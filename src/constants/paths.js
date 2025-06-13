@@ -1,5 +1,5 @@
 /**
- * File paths and directory constants for Guidant Evolution
+ * File paths and directory constants for Guidant
  */
 
 export const GUIDANT_DIR = '.guidant';

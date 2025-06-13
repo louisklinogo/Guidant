@@ -32,7 +32,29 @@
 
 [] mockups for ui in cli
 
-[] In guidant, are tasks generated progressively or at the start then the ai agent follows?, help me understand
+[] In guidant, are tasks generated progressively or at the start then the ai agent follows?, help me 
+understand
+
+[] Basic Task scaffold, then when you report progress dynamically updates
+
+[] Check files, workflow-engine, phase-transition-engine,project-structure
+
+[] Can an AI agent or agnecy be a mcp server? If we wanted to turn guidant into an AI agent and use Googles A2A protocol to make coding agents like cursor and cascade talk to it?
+
+[] In the .guidant folder, lets add a vision.md or concept.md file that contains a preliminary vision or concept of what one wants to build
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 🚀 **SDLC Phases + Matching Design Principles**
